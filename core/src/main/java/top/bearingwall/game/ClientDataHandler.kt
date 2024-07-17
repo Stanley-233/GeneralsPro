@@ -7,6 +7,7 @@ import top.bearingwall.game.net.ClientThread
 object ClientDataHandler {
     var player: Player? = null
     var isGameStarted = false
+    var turnCounter = 0
 
     fun gameReady() {
         ClientThread().start()

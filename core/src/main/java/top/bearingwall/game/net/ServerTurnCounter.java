@@ -6,8 +6,10 @@ public class ServerTurnCounter extends Thread  {
     @Override
     public void run() {
         try {
-            sleep(1000);
-            // TODO: handle movement and 
+            // TODO: handle movement and turn calculation
+            while (true) {
+                sleep(1000);
+            }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

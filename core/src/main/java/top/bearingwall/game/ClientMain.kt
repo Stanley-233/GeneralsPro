@@ -1,15 +1,12 @@
 package top.bearingwall.game
 
-import com.badlogic.gdx.ApplicationAdapter
-import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.*
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.scenes.scene2d.*
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -24,6 +21,8 @@ import top.bearingwall.game.ui.StartButtonStyle
 object ClientMain : ApplicationAdapter() {
     private val dataHandler = ClientDataHandler
     var toDrawGridList: ArrayList<Grid> = ArrayList()
+    private var onSelectX = 0
+    private var onSelectY = 0
 
     private lateinit var stage: Stage
     private lateinit var playerName: TextField
@@ -31,13 +30,71 @@ object ClientMain : ApplicationAdapter() {
     private lateinit var font: BitmapFont
 
     private lateinit var batch: SpriteBatch
+    private lateinit var sr: ShapeRenderer
     private lateinit var title: Texture
     private lateinit var background: Texture
     private lateinit var king: Texture
     private lateinit var mountain: Texture
     private lateinit var tower: Texture
+    private lateinit var selection: Texture
 
     var mapUpdateFlag = false
+
+    object MyInputProcessor : InputProcessor {
+        override fun keyDown(keycode: Int): Boolean {
+            // TODO("Not yet implemented")
+            return false
+        }
+
+        override fun keyUp(keycode: Int): Boolean {
+            // TODO("Not yet implemented")
+            return false
+        }
+
+        override fun keyTyped(character: Char): Boolean {
+            // TODO("Not yet implemented")
+            if (character == 'w') {
+                onSelectY++
+            } else if (character == 'a') {
+                onSelectX--
+            } else if (character == 's') {
+                onSelectY--
+            } else if (character == 'd') {
+                onSelectX++
+            }
+            return false
+        }
+
+        override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+            if (button == Input.Buttons.LEFT) {
+//                println("x:" + screenX + "y:" +screenY)
+                onSelectX = screenX / 50
+                onSelectY = (1000 - screenY) / 50
+                return true
+            }
+            return false
+        }
+
+        override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+            return false
+        }
+
+        override fun touchCancelled(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+            return false
+        }
+
+        override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+            return false
+        }
+
+        override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+            return false
+        }
+
+        override fun scrolled(amountX: Float, amountY: Float): Boolean {
+            return false
+        }
+    }
 
     override fun create() {
         font = BitmapFont()
@@ -45,7 +102,11 @@ object ClientMain : ApplicationAdapter() {
         font.data.setScale(1.5f)
 
         stage = Stage()
-        Gdx.input.inputProcessor = stage
+        sr = ShapeRenderer()
+        val multiplexer = InputMultiplexer()
+        Gdx.input.inputProcessor = multiplexer
+        multiplexer.addProcessor(stage)
+        multiplexer.addProcessor(MyInputProcessor)
         playerName = TextField("", InputTextFileStyle)
         playerName.setSize(400f, 100f)
         playerName.setPosition(300f, 500f)
@@ -62,6 +123,7 @@ object ClientMain : ApplicationAdapter() {
                 dataHandler.gameReady()
                 startButton.touchable = Touchable.disabled
                 playerName.touchable = Touchable.disabled
+                playerName.isDisabled = true
             }
         })
         stage.addActor(startButton)
@@ -72,6 +134,7 @@ object ClientMain : ApplicationAdapter() {
         king = Texture("king.png")
         mountain = Texture("mountain.png")
         tower = Texture("tower.png")
+        selection = Texture("selection.png")
     }
 
     override fun render() {
@@ -80,7 +143,6 @@ object ClientMain : ApplicationAdapter() {
             batch.begin()
             batch.draw(background, 0f, 0f)
             batch.end()
-            // TODO: Draw Map
             drawMap(mapUpdateFlag)
         } else {
             batch.begin()
@@ -97,7 +159,7 @@ object ClientMain : ApplicationAdapter() {
             for (grid in toDrawGridList) {
                 val x: Float = grid.x * 50 + 1f
                 val y: Float = grid.y * 50 + 1f
-                val sr = ShapeRenderer()
+
                 if (grid is Blank) {
                     sr.begin(ShapeRenderer.ShapeType.Filled)
                     sr.setColor(Color.LIGHT_GRAY)
@@ -140,6 +202,17 @@ object ClientMain : ApplicationAdapter() {
                     sr.rect(x,y,48f,48f)
                 }
             }
+            // draw selection
+            if (onSelectX < 0) onSelectX = 0
+            if (onSelectX > 19) onSelectX = 19
+            if (onSelectY < 0) onSelectY = 0
+            if (onSelectY > 19) onSelectY = 19
+            batch.begin()
+            val x = onSelectX*50f+2
+            val y = onSelectY*50f+2
+//            println("x:"+x+"y:"+y)
+            batch.draw(selection, x, y)
+            batch.end()
         }
     }
 

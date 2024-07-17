@@ -18,7 +18,8 @@ public class ClientThread extends Thread {
             System.out.println("已连接到服务器");
             ObjectOutputStream oos = new ObjectOutputStream(connection.getOutputStream());
             ObjectInputStream ois = new ObjectInputStream(connection.getInputStream());
-            while (true) {
+            // TODO: fix memory leak
+            while (!isMapReceived) {
                 if (!ClientDataHandler.INSTANCE.isGameStarted()) {
                     oos.writeObject(ClientDataHandler.INSTANCE.getPlayer());
                     System.out.println("已发送玩家信息!");
@@ -32,11 +33,16 @@ public class ClientThread extends Thread {
                         isMapReceived = true;
                     }
                 }
+            }
+            while (true) {
                 if (isMapReceived) {
+                    // TODO: Listen to server and change turn count
                     ClientDataHandler.INSTANCE.setTurnCounter(ClientDataHandler.INSTANCE.getTurnCounter() + 1);
                     ClientDataHandler.INSTANCE.calculateMap();
                 }
+                var data = ois.readObject();
             }
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e.getLocalizedMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         }
