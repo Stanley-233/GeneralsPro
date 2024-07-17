@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Server" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="top.bearingwall.game.ServerMain" />
+    <module name="GeneralsPro.core.main" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
