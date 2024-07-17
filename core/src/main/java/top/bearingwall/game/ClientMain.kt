@@ -13,42 +13,45 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.ScreenUtils
+import top.bearingwall.game.data.Player
 import top.bearingwall.game.ui.InputTextFileStyle
 import top.bearingwall.game.ui.StartButtonStyle
 
 
-class ClientMain : ApplicationAdapter() {
-    private val isGameStarted = false
-    private var batch: SpriteBatch? = null
+object ClientMain : ApplicationAdapter() {
+    private val dataHandler = ClientDataHandler
 
-    private var stage: Stage? = null
-    private var playerName: TextField? = null
-    private var startButton: Button? = null
+    private lateinit var stage: Stage
+    private lateinit var playerName: TextField
+    private lateinit var startButton: Button
 
-    private var title: Texture? = null
-    private var background: Texture? = null
-    private var king: Texture? = null
-    private var mountain: Texture? = null
-    private var tower: Texture? = null
+    private lateinit var batch: SpriteBatch
+    private lateinit var title: Texture
+    private lateinit var background: Texture
+    private lateinit var king: Texture
+    private lateinit var mountain: Texture
+    private lateinit var tower: Texture
 
     override fun create() {
         stage = Stage()
         Gdx.input.inputProcessor = stage
         playerName = TextField("", InputTextFileStyle)
-        playerName!!.setSize(400f, 100f)
-        playerName!!.setPosition(300f, 500f)
-        playerName!!.alignment = Align.center
-        playerName!!.messageText = "Please Enter Player Name"
-        stage!!.addActor(playerName)
+        playerName.setSize(400f, 100f)
+        playerName.setPosition(300f, 500f)
+        playerName.alignment = Align.center
+        playerName.messageText = "Please Enter Player Name"
+        stage.addActor(playerName)
         startButton = Button(StartButtonStyle)
-        startButton!!.setSize(400f, 100f)
-        startButton!!.setPosition(300f, 200f)
-        startButton!!.addListener(object : ClickListener() {
+        startButton.setSize(400f, 100f)
+        startButton.setPosition(300f, 200f)
+        startButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 println("按钮被点击")
+                dataHandler.player = Player(playerName.text.toString())
+                dataHandler.gameReady()
             }
         })
-        stage!!.addActor(startButton)
+        stage.addActor(startButton)
 
         batch = SpriteBatch()
         background = Texture("background.png")
@@ -60,10 +63,10 @@ class ClientMain : ApplicationAdapter() {
 
     override fun render() {
         ScreenUtils.clear(0.255f, 0.255f, 0.255f, 1f)
-        if (isGameStarted) {
-            batch!!.begin()
-            batch!!.draw(background, 0f, 0f)
-            batch!!.end()
+        if (dataHandler.isGameStarted) {
+            batch.begin()
+            batch.draw(background, 0f, 0f)
+            batch.end()
 
             val sr = ShapeRenderer()
             sr.begin(ShapeRenderer.ShapeType.Filled)
@@ -71,26 +74,27 @@ class ClientMain : ApplicationAdapter() {
             sr.rect((1 + 50 * 5).toFloat(), 1f, 48f, 48f)
             sr.end()
 
-            batch!!.begin()
-            batch!!.draw(king, 0f, 0f)
-            batch!!.end()
+            batch.begin()
+            batch.draw(king, 0f, 0f)
+            batch.end()
         } else {
-            batch!!.begin()
-            batch!!.draw(title, 260f, 750f)
-            batch!!.end()
+            batch.begin()
+            batch.draw(title, 260f, 750f)
+            batch.end()
 
-            stage!!.act()
-            stage!!.draw()
+            stage.act()
+            stage.draw()
         }
     }
 
     override fun dispose() {
-        batch!!.dispose()
-        background!!.dispose()
-        stage!!.dispose()
-        title!!.dispose()
-        mountain!!.dispose()
-        tower!!.dispose()
-        king!!.dispose()
+        stage.dispose()
+
+        batch.dispose()
+        title.dispose()
+        background.dispose()
+        king.dispose()
+        mountain.dispose()
+        tower.dispose()
     }
 }
