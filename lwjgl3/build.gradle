@@ -113,3 +113,12 @@ repositories {
 kotlin {
     jvmToolchain(11)
 }
+tasks.withType(JavaCompile) {
+  options.encoding = "utf-8"
+}
+tasks.withType(Javadoc) {
+  options.encoding = "utf-8"
+}
+tasks.withType(JavaExec){
+  jvmArgs = ['-Xmx512m', '-Dfile.encoding=UTF-8', '-Dsun.stdout.encoding=UTF-8','-Dsun.stderr.encoding=UTF-8']
+}
