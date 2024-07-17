@@ -1,0 +1,19 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+}
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-core'
+
+dependencies {
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  api "com.kotcrab.vis:vis-ui:$visUiVersion"
+  api "net.onedaybeard.artemis:artemis-odb:$artemisOdbVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+  compileOnly "org.projectlombok:lombok:1.18.4"
+}
+repositories {
+    mavenCentral()
+}
+kotlin {
+    jvmToolchain(11)
+}
