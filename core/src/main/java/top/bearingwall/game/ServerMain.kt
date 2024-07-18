@@ -8,7 +8,6 @@ import top.bearingwall.game.net.ServerThread
 import java.lang.Thread.sleep
 import java.net.ServerSocket
 import java.util.*
-import kotlin.collections.ArrayList
 
 object ServerMain {
     val clients = HashMap<Int,ServerThread>()
@@ -79,6 +78,7 @@ object ServerMain {
         }
     }
 
+    @Synchronized
     fun nextTurn() {
         println("turn:" + turnCount)
         turnCount++
@@ -87,41 +87,79 @@ object ServerMain {
                 val grid = grids[x][y]
                 if (grid is King) {
                     grid.power++
+                } else if (grid is Tower && grid.player != SystemPlayer) {
+                    grid.power++
                 }
-                if (turnCount % 15 == 0 && !(grid is Tower)) {
+                if (turnCount % 25 == 0 && !(grid is Tower)) {
                     grid.power++
                 }
                 grids[x][y] = grid
             }
-            for (m in moveList) {
-                // TODO: movement handler
-                if (grids[m.originX][m.originY].power == 1) {
-                    moveList.remove(m)
-                    continue
-                }
-                var endX : Int = m.originX
-                var endY : Int = m.originY
-                when (m.type) {
-                    1 -> endY++
-                    2 -> endX--
-                    3 -> endY--
-                    4 -> endX++
-                }
-                if (grids[endX][endY] is Blank) {
-                    // 空地
-                    grids[endX][endY] = Grid(grids[m.originX][m.originY].player,grids[m.originX][m.originY].power-1,endX,endY)
-                    grids[m.originX][m.originY].power = 1
-                } else if (grids[endX][endY] is Tower) {
-                    if (grids[endX][endY] is King) {
-
-                    } else {
-                        // 野塔及其他人占领的塔
+            try {
+                for (m in moveList) {
+                    // TODO: movement handler
+                    if (grids[m.originX][m.originY].power == 1) {
+                        moveList.remove(m)
+                        continue
                     }
-                } else if (!(grids[endX][endY] is Mountain)) {
-                    // 其他人占领的格子
+                    var endX : Int = m.originX
+                    var endY : Int = m.originY
+                    when (m.type) {
+                        1 -> endY++
+                        2 -> endX--
+                        3 -> endY--
+                        4 -> endX++
+                    }
+                    if (grids[endX][endY] is Blank) {
+                        // 空地
+                        grids[endX][endY] = Grid(grids[m.originX][m.originY].player,grids[m.originX][m.originY].power-1,endX,endY)
+                        grids[m.originX][m.originY].power = 1
+                    } else if (grids[endX][endY] is Tower) {
+                        if (grids[endX][endY] is King) {
+                            // 自家King
+                            if (grids[endX][endY].player.name == m.playerName) {
+                                val endPrePower = grids[endX][endY].power
+                                val oriPrePower = grids[m.originX][m.originY].power
+                                grids[endX][endY] = King(grids[m.originX][m.originY].player,endPrePower + oriPrePower - 1,endX,endY)
+                                grids[m.originX][m.originY].power = 1
+                            }
+                        } else {
+                            // 自家塔
+                            if (grids[endX][endY].player.name == m.playerName) {
+                                val endPrePower = grids[endX][endY].power
+                                val oriPrePower = grids[m.originX][m.originY].power
+                                grids[endX][endY].power = endPrePower + oriPrePower - 1
+                                grids[m.originX][m.originY].power = 1
+                            } else {
+                                // 野塔及其他人占领的塔
+                                val endPrePower = grids[endX][endY].power
+                                val oriPrePower = grids[m.originX][m.originY].power
+                                if (endPrePower >= oriPrePower) {
+                                    grids[endX][endY].power -= (oriPrePower-1)
+                                    grids[m.originX][m.originY].power = 1
+                                } else {
+                                    val endNowPower = oriPrePower-1-endPrePower
+                                    grids[m.originX][m.originY].power = 1
+                                    grids[endX][endY] = Tower(grids[m.originX][m.originY].player,endNowPower,endX,endY)
+                                }
+                            }
+                        }
+                    } else if (!(grids[endX][endY] is Mountain)) {
+                        if (grids[endX][endY].player.name == m.playerName) {
+                            // 自己的格子
+                            val endPrePower = grids[endX][endY].power
+                            val oriPrePower = grids[m.originX][m.originY].power
+                            grids[endX][endY].power = endPrePower + oriPrePower - 1
+                            grids[m.originX][m.originY].power = 1
+                        } else {
+
+                        }
+                    }
+                    // Mountain 无需判断
+                    moveList.remove(m)
                 }
-                // Mountain 无需判断
-                moveList.remove(m)
+            } catch (e: RuntimeException) {
+                e.printStackTrace()
             }
         }
         sleep(1000)

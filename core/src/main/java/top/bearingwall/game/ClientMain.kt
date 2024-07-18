@@ -46,7 +46,6 @@ object ClientMain : ApplicationAdapter() {
     private lateinit var mountain: Texture
     private lateinit var tower: Texture
     private lateinit var selection: Texture
-    private lateinit var selection_2: Texture
 
     var mapUpdateFlag = false
 
@@ -90,7 +89,6 @@ object ClientMain : ApplicationAdapter() {
         mountain = Texture("mountain.png")
         tower = Texture("tower.png")
         selection = Texture("selection.png")
-        selection_2 = Texture("selection_2.png")
     }
 
     override fun render() {
@@ -147,6 +145,11 @@ object ClientMain : ApplicationAdapter() {
                             sr.setColor(Color.LIGHT_GRAY)
                             sr.rect(x,y,48f,48f)
                             sr.end()
+                        } else if (grid.player.name == ClientMain.playerName) {
+                            sr.begin(ShapeRenderer.ShapeType.Filled)
+                            sr.setColor(Color.BLUE)
+                            sr.rect(x,y,48f,48f)
+                            sr.end()
                         }
                         batch.begin()
                         batch.draw(tower, x, y)
@@ -170,12 +173,7 @@ object ClientMain : ApplicationAdapter() {
                 val x = onSelectX*50f+2
                 val y = onSelectY*50f+2
                 batch.begin()
-//            println("x:"+x+"y:"+y)
-//                if (trueSelect) {
-//                    batch.draw(selection_2, x, y)
-//                } else {
-                    batch.draw(selection, x, y)
-//                }
+                batch.draw(selection, x, y)
                 batch.end()
             } catch (e: RuntimeException) {
                 System.err.println(e)
@@ -193,6 +191,5 @@ object ClientMain : ApplicationAdapter() {
         mountain.dispose()
         tower.dispose()
         selection.dispose()
-        selection_2.dispose()
     }
 }
