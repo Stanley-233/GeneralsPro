@@ -1,6 +1,6 @@
 package top.bearingwall.game.net;
 
-import top.bearingwall.game.ClientDataHandler;
+import top.bearingwall.game.util.ClientDataHandler;
 import top.bearingwall.game.data.GameMap;
 import top.bearingwall.game.data.Grid;
 
@@ -14,11 +14,10 @@ public class ClientThread extends Thread {
     @Override
     public void run() {
         try {
-            Socket connection = new Socket("127.0.0.1", 13695);
+            Socket connection = new Socket("127.0.0.1", 13696);
             System.out.println("已连接到服务器");
             ObjectOutputStream oos = new ObjectOutputStream(connection.getOutputStream());
             ObjectInputStream ois = new ObjectInputStream(connection.getInputStream());
-            // TODO: fix memory leak
             while (!isMapReceived) {
                 if (!ClientDataHandler.INSTANCE.isGameStarted()) {
                     oos.writeObject(ClientDataHandler.INSTANCE.getPlayer());
@@ -35,12 +34,18 @@ public class ClientThread extends Thread {
                 }
             }
             while (true) {
+                // TODO: Power unchanged
+                var data = ois.readObject();
+                if (data instanceof Grid[][]) {
+                    System.out.println("已收到GameMap");
+                    GameMap.setGrids((Grid[][]) data);
+                } else if (data instanceof Integer) {
+                    ClientDataHandler.INSTANCE.setTurnCounter((Integer) data);
+                    System.out.println("当前回合数：" + data);
+                }
                 if (isMapReceived) {
-                    // TODO: Listen to server and change turn count
-                    ClientDataHandler.INSTANCE.setTurnCounter(ClientDataHandler.INSTANCE.getTurnCounter() + 1);
                     ClientDataHandler.INSTANCE.calculateMap();
                 }
-                var data = ois.readObject();
             }
 
         } catch (Exception e) {

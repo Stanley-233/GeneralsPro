@@ -1,5 +1,6 @@
-package top.bearingwall.game
+package top.bearingwall.game.util
 
+import top.bearingwall.game.ClientMain
 import top.bearingwall.game.data.GameMap
 import top.bearingwall.game.data.Player
 import top.bearingwall.game.net.ClientThread
@@ -13,7 +14,7 @@ object ClientDataHandler {
         ClientThread().start()
     }
 
-     fun calculateMap() {
+    fun calculateMap() {
         ClientMain.toDrawGridList.clear()
         for (i in 0..19) {
             for (j in 0..19) {

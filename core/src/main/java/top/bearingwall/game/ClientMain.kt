@@ -16,13 +16,15 @@ import top.bearingwall.game.data.*
 import top.bearingwall.game.data.Player
 import top.bearingwall.game.ui.InputTextFileStyle
 import top.bearingwall.game.ui.StartButtonStyle
-
+import top.bearingwall.game.util.ClientDataHandler
+import java.util.LinkedList
 
 object ClientMain : ApplicationAdapter() {
     private val dataHandler = ClientDataHandler
-    var toDrawGridList: ArrayList<Grid> = ArrayList()
+    var toDrawGridList: LinkedList<Grid> = LinkedList()
     private var onSelectX = 0
     private var onSelectY = 0
+    private var trueSelect = false
 
     private lateinit var stage: Stage
     private lateinit var playerName: TextField
@@ -37,12 +39,26 @@ object ClientMain : ApplicationAdapter() {
     private lateinit var mountain: Texture
     private lateinit var tower: Texture
     private lateinit var selection: Texture
+    private lateinit var selection_2: Texture
 
     var mapUpdateFlag = false
 
     object MyInputProcessor : InputProcessor {
         override fun keyDown(keycode: Int): Boolean {
             // TODO("Not yet implemented")
+            if (keycode == Input.Keys.W) {
+                onSelectY++
+            } else if (keycode == Input.Keys.A) {
+                onSelectX--
+            } else if (keycode == Input.Keys.S) {
+                onSelectY--
+            } else if (keycode == Input.Keys.D) {
+                onSelectX++
+            } else if (keycode == Input.Keys.ENTER) {
+                if (trueSelect) {
+                    trueSelect = false
+                } else trueSelect = true
+            }
             return false
         }
 
@@ -53,15 +69,7 @@ object ClientMain : ApplicationAdapter() {
 
         override fun keyTyped(character: Char): Boolean {
             // TODO("Not yet implemented")
-            if (character == 'w') {
-                onSelectY++
-            } else if (character == 'a') {
-                onSelectX--
-            } else if (character == 's') {
-                onSelectY--
-            } else if (character == 'd') {
-                onSelectX++
-            }
+
             return false
         }
 
@@ -135,6 +143,7 @@ object ClientMain : ApplicationAdapter() {
         mountain = Texture("mountain.png")
         tower = Texture("tower.png")
         selection = Texture("selection.png")
+        selection_2 = Texture("selection_2.png")
     }
 
     override fun render() {
@@ -156,63 +165,71 @@ object ClientMain : ApplicationAdapter() {
 
     fun drawMap(flag: Boolean) {
         if (flag) {
-            for (grid in toDrawGridList) {
-                val x: Float = grid.x * 50 + 1f
-                val y: Float = grid.y * 50 + 1f
+            try {
+                for (grid in toDrawGridList) {
+                    val x: Float = grid.x * 50 + 1f
+                    val y: Float = grid.y * 50 + 1f
 
-                if (grid is Blank) {
-                    sr.begin(ShapeRenderer.ShapeType.Filled)
-                    sr.setColor(Color.LIGHT_GRAY)
-                    sr.rect(x,y,48f,48f)
-                    sr.end()
-                } else if (grid is Mountain) {
-                    batch.begin()
-                    batch.draw(mountain, x, y)
-                    batch.end()
-                } else if (grid is King) {
-                    if (grid.player.name == playerName.text) {
-                        sr.begin(ShapeRenderer.ShapeType.Filled)
-                        sr.setColor(Color.BLUE)
-                        sr.rect(x,y,48f,48f)
-                        sr.end()
-                    } else {
-                        sr.begin(ShapeRenderer.ShapeType.Filled)
-                        sr.setColor(Color.RED)
-                        sr.rect(x,y,48f,48f)
-                        sr.end()
-                    }
-                    batch.begin()
-                    batch.draw(king, x, y)
-                    font.draw(batch, grid.power.toString(), x+12, y+28)
-                    batch.end()
-                } else if (grid is Tower) {
-                    if (grid.player == SystemPlayer) {
+                    if (grid is Blank) {
                         sr.begin(ShapeRenderer.ShapeType.Filled)
                         sr.setColor(Color.LIGHT_GRAY)
                         sr.rect(x,y,48f,48f)
                         sr.end()
+                    } else if (grid is Mountain) {
+                        batch.begin()
+                        batch.draw(mountain, x, y)
+                        batch.end()
+                    } else if (grid is King) {
+                        if (grid.player.name == playerName.text) {
+                            sr.begin(ShapeRenderer.ShapeType.Filled)
+                            sr.setColor(Color.BLUE)
+                            sr.rect(x,y,48f,48f)
+                            sr.end()
+                        } else {
+                            sr.begin(ShapeRenderer.ShapeType.Filled)
+                            sr.setColor(Color.RED)
+                            sr.rect(x,y,48f,48f)
+                            sr.end()
+                        }
+                        batch.begin()
+                        batch.draw(king, x, y)
+                        font.draw(batch, grid.power.toString(), x+12, y+28)
+                        batch.end()
+                    } else if (grid is Tower) {
+                        if (grid.player == SystemPlayer) {
+                            sr.begin(ShapeRenderer.ShapeType.Filled)
+                            sr.setColor(Color.LIGHT_GRAY)
+                            sr.rect(x,y,48f,48f)
+                            sr.end()
+                        }
+                        batch.begin()
+                        batch.draw(tower, x, y)
+                        font.draw(batch, grid.power.toString(), x+12, y+28)
+                        batch.end()
+                    } else {
+                        sr.begin(ShapeRenderer.ShapeType.Filled)
+                        sr.setColor(Color.FOREST)
+                        sr.rect(x,y,48f,48f)
                     }
-                    batch.begin()
-                    batch.draw(tower, x, y)
-                    font.draw(batch, grid.power.toString(), x+12, y+28)
-                    batch.end()
-                } else {
-                    sr.begin(ShapeRenderer.ShapeType.Filled)
-                    sr.setColor(Color.FOREST)
-                    sr.rect(x,y,48f,48f)
                 }
-            }
-            // draw selection
-            if (onSelectX < 0) onSelectX = 0
-            if (onSelectX > 19) onSelectX = 19
-            if (onSelectY < 0) onSelectY = 0
-            if (onSelectY > 19) onSelectY = 19
-            batch.begin()
-            val x = onSelectX*50f+2
-            val y = onSelectY*50f+2
+                // draw selection
+                if (onSelectX < 0) onSelectX = 0
+                if (onSelectX > 19) onSelectX = 19
+                if (onSelectY < 0) onSelectY = 0
+                if (onSelectY > 19) onSelectY = 19
+                val x = onSelectX*50f+2
+                val y = onSelectY*50f+2
+                batch.begin()
 //            println("x:"+x+"y:"+y)
-            batch.draw(selection, x, y)
-            batch.end()
+                if (trueSelect) {
+                    batch.draw(selection_2, x, y)
+                } else {
+                    batch.draw(selection, x, y)
+                }
+                batch.end()
+            } catch (e: RuntimeException) {
+                System.err.println(e)
+            }
         }
     }
 
@@ -225,5 +242,7 @@ object ClientMain : ApplicationAdapter() {
         king.dispose()
         mountain.dispose()
         tower.dispose()
+        selection.dispose()
+        selection_2.dispose()
     }
 }

@@ -14,6 +14,8 @@ public class ServerThread extends Thread {
     private final Socket socket;
     private final HashMap<Integer,Player> playerMap;
     private int playerIndex = 0;
+    ObjectOutputStream oos;
+    ObjectInputStream ois;
 
     public ServerThread(Socket socket, HashMap<Integer,Player> playerMap) {
         this.socket = socket;
@@ -22,9 +24,9 @@ public class ServerThread extends Thread {
 
     @Override
     public void run() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream())
-        ) {
+        try {
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            ois = new ObjectInputStream(socket.getInputStream());
             while (true) {
                 System.out.println(currentThread().getName() + ": 等待读取客户端回包...");
                 Object data = ois.readObject();
@@ -42,10 +44,6 @@ public class ServerThread extends Thread {
                     var grids = GameMap.getGrids();
                     grids[x][y] = new King(playerMap.get(0),1,x,y);
                     GameMap.setGrids(grids);
-                    oos.writeObject(GameMap.getGrids());
-                    System.out.println(currentThread().getName() + ": 已发送GameMap");
-                    oos.flush();
-                    ServerMain.INSTANCE.setGameOpen(true);
                 }
             }
         } catch (IOException | ClassNotFoundException | InterruptedException e) {
@@ -63,6 +61,21 @@ public class ServerThread extends Thread {
             System.out.println("等待更多玩家加入...");
             wait();
         }
+    }
+
+    public void sendMap() throws IOException {
+        var grids = GameMap.getGrids();
+        oos.reset();
+        oos.writeObject(grids);
+        System.out.println(currentThread().getName() + ": 已发送GameMap");
+        oos.flush();
+        ServerMain.INSTANCE.setGameOpen(true);
+    }
+
+    public void sendTurn(int turn) throws IOException {
+        oos.writeObject(turn);
+        System.out.println(currentThread().getName() + ": 已发送回合数" + turn);
+        oos.flush();
     }
 
 }
