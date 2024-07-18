@@ -40,7 +40,6 @@ public class ClientThread extends Thread {
                 }
             }
             while (true) {
-                // TODO: Power unchanged
                 var data = ois.readObject();
                 if (data instanceof Grid[][]) {
                     System.out.println("已收到GameMap");

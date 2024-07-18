@@ -27,7 +27,7 @@ object ClientDataHandler {
     }
 
     fun setMove(type: Int, x: Int, y: Int) {
-        ClientMain.currentMove = Move(type, x, y)
+        ClientMain.currentMove = Move(ClientMain.playerName,type, x, y)
         ClientThread.sendMove(ClientMain.currentMove)
     }
 }

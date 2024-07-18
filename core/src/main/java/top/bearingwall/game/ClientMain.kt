@@ -154,8 +154,12 @@ object ClientMain : ApplicationAdapter() {
                         batch.end()
                     } else {
                         sr.begin(ShapeRenderer.ShapeType.Filled)
-                        sr.setColor(Color.FOREST)
+                        sr.setColor(Color.BLUE)
                         sr.rect(x,y,48f,48f)
+                        sr.end()
+                        batch.begin()
+                        font.draw(batch, grid.power.toString(), x+12, y+28)
+                        batch.end()
                     }
                 }
                 // draw selection

@@ -66,7 +66,6 @@ object ServerMain {
             }
             println("main: 游戏已开始")
             while (true) {
-                //TODO: turn handle
                 nextTurn()
                 for (x in 0..<clients.size) {
                     val client = clients[x]
@@ -90,11 +89,38 @@ object ServerMain {
                     grid.power++
                 }
                 if (turnCount % 15 == 0 && !(grid is Tower)) {
-                    grid.power *= 2
+                    grid.power++
                 }
                 grids[x][y] = grid
             }
             for (m in moveList) {
+                // TODO: movement handler
+                if (grids[m.originX][m.originY].power == 1) {
+                    moveList.remove(m)
+                    continue
+                }
+                var endX : Int = m.originX
+                var endY : Int = m.originY
+                when (m.type) {
+                    1 -> endY++
+                    2 -> endX--
+                    3 -> endY--
+                    4 -> endX++
+                }
+                if (grids[endX][endY] is Blank) {
+                    // 空地
+                    grids[endX][endY] = Grid(grids[m.originX][m.originY].player,grids[m.originX][m.originY].power-1,endX,endY)
+                    grids[m.originX][m.originY].power = 1
+                } else if (grids[endX][endY] is Tower) {
+                    if (grids[endX][endY] is King) {
+
+                    } else {
+                        // 野塔及其他人占领的塔
+                    }
+                } else if (!(grids[endX][endY] is Mountain)) {
+                    // 其他人占领的格子
+                }
+                // Mountain 无需判断
                 moveList.remove(m)
             }
         }

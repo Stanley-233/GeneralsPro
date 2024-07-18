@@ -40,7 +40,6 @@ public class ServerThread extends Thread {
                     System.out.println(currentThread().getName() + ": 不支持的数据类型...");
                 }
                 if (!ServerMain.INSTANCE.isGameOpen()) {
-                    // TODO: create map
                     Random r = new Random(System.currentTimeMillis());
                     int x = r.nextInt(20);
                     int y = r.nextInt(20);
