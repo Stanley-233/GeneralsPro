@@ -1,7 +1,5 @@
 package top.bearingwall.game.data;
 
-import lombok.Getter;
-
 import java.io.Serializable;
 
 public final class GameMap implements Serializable {

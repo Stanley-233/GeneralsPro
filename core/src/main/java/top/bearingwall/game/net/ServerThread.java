@@ -33,6 +33,9 @@ public class ServerThread extends Thread {
                 if (data instanceof Player) {
                     var clientData = (Player) data;
                     addPlayer(clientData);
+                } else if (data instanceof Move) {
+                    ServerMain.INSTANCE.getMoveList().add((Move) data);
+                    System.out.println("已加入Move");
                 } else {
                     System.out.println(currentThread().getName() + ": 不支持的数据类型...");
                 }

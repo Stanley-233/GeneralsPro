@@ -1,5 +1,7 @@
 package top.bearingwall.game.net;
 
+import lombok.Getter;
+import lombok.Setter;
 import top.bearingwall.game.util.ClientDataHandler;
 import top.bearingwall.game.data.GameMap;
 import top.bearingwall.game.data.Grid;
@@ -9,17 +11,21 @@ import java.net.Socket;
 import javax.swing.JOptionPane;
 
 public class ClientThread extends Thread {
-    private volatile boolean isMapReceived = false;
+    private boolean isMapReceived = false;
+    private Socket connection;
+    private static ObjectOutputStream oos;
+    private static ObjectInputStream ois;
 
     @Override
     public void run() {
         try {
-            Socket connection = new Socket("127.0.0.1", 13696);
+            connection = new Socket("127.0.0.1", 13696);
+            oos = new ObjectOutputStream(connection.getOutputStream());
+            ois = new ObjectInputStream(connection.getInputStream());
             System.out.println("已连接到服务器");
-            ObjectOutputStream oos = new ObjectOutputStream(connection.getOutputStream());
-            ObjectInputStream ois = new ObjectInputStream(connection.getInputStream());
             while (!isMapReceived) {
                 if (!ClientDataHandler.INSTANCE.isGameStarted()) {
+                    oos.reset();
                     oos.writeObject(ClientDataHandler.INSTANCE.getPlayer());
                     System.out.println("已发送玩家信息!");
                     oos.flush();
@@ -49,7 +55,14 @@ public class ClientThread extends Thread {
             }
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e.getLocalizedMessage(), "错误", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
+    }
+
+    public static void sendMove(Move move) throws IOException {
+        oos.reset();
+        oos.writeObject(move);
+        System.out.println("已发送移动信息!");
+        oos.flush();
     }
 }

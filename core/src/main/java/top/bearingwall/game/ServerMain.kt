@@ -13,7 +13,9 @@ import kotlin.collections.ArrayList
 object ServerMain {
     val clients = HashMap<Int,ServerThread>()
     val playerMap = HashMap<Int,Player>()
-    val moveList = ArrayList<Move>()
+    @get:Synchronized
+    @set:Synchronized
+    var moveList = LinkedList<Move>()
     var isGameOpen: Boolean = false
     var turnCount: Int = 0
 

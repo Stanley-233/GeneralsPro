@@ -4,6 +4,7 @@ import top.bearingwall.game.ClientMain
 import top.bearingwall.game.data.GameMap
 import top.bearingwall.game.data.Player
 import top.bearingwall.game.net.ClientThread
+import top.bearingwall.game.net.Move
 
 object ClientDataHandler {
     var player: Player? = null
@@ -23,5 +24,10 @@ object ClientDataHandler {
             }
         }
         ClientMain.mapUpdateFlag = true
+    }
+
+    fun setMove(type: Int, x: Int, y: Int) {
+        ClientMain.currentMove = Move(type, x, y)
+        ClientThread.sendMove(ClientMain.currentMove)
     }
 }

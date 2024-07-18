@@ -1,11 +1,9 @@
 package top.bearingwall.game.net
 
-import top.bearingwall.game.data.Player
+import top.bearingwall.game.ClientMain
 import java.io.Serializable
 
-class Move : Serializable {
-    lateinit var player: Player
-    val type: Int = 0
-    val originX: Int = 0
-    val originY: Int = 0
+class Move(type: Int, originX: Int, originY: Int) : Serializable {
+    val playerName = ClientMain.playerName
+    // 1=W 2=A 3=S 4=D
 }

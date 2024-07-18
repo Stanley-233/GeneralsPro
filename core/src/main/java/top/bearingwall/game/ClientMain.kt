@@ -1,33 +1,40 @@
 package top.bearingwall.game
 
-import com.badlogic.gdx.*
+import com.badlogic.gdx.ApplicationAdapter
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.scenes.scene2d.*
+import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.ScreenUtils
 import top.bearingwall.game.data.*
-import top.bearingwall.game.data.Player
+import top.bearingwall.game.net.Move
 import top.bearingwall.game.ui.InputTextFileStyle
 import top.bearingwall.game.ui.StartButtonStyle
 import top.bearingwall.game.util.ClientDataHandler
-import java.util.LinkedList
+import top.bearingwall.game.util.MyInputProcessor
+import java.util.*
 
 object ClientMain : ApplicationAdapter() {
     private val dataHandler = ClientDataHandler
+    var currentMove: Move? = null
+    var playerName = "Default"
     var toDrawGridList: LinkedList<Grid> = LinkedList()
-    private var onSelectX = 0
-    private var onSelectY = 0
-    private var trueSelect = false
+    var onSelectX = 0
+    var onSelectY = 0
+//    var trueSelect = false
 
     private lateinit var stage: Stage
-    private lateinit var playerName: TextField
+    private lateinit var playerNameField: TextField
     private lateinit var startButton: Button
     private lateinit var font: BitmapFont
 
@@ -43,67 +50,6 @@ object ClientMain : ApplicationAdapter() {
 
     var mapUpdateFlag = false
 
-    object MyInputProcessor : InputProcessor {
-        override fun keyDown(keycode: Int): Boolean {
-            // TODO("Not yet implemented")
-            if (keycode == Input.Keys.W) {
-                onSelectY++
-            } else if (keycode == Input.Keys.A) {
-                onSelectX--
-            } else if (keycode == Input.Keys.S) {
-                onSelectY--
-            } else if (keycode == Input.Keys.D) {
-                onSelectX++
-            } else if (keycode == Input.Keys.ENTER) {
-                if (trueSelect) {
-                    trueSelect = false
-                } else trueSelect = true
-            }
-            return false
-        }
-
-        override fun keyUp(keycode: Int): Boolean {
-            // TODO("Not yet implemented")
-            return false
-        }
-
-        override fun keyTyped(character: Char): Boolean {
-            // TODO("Not yet implemented")
-
-            return false
-        }
-
-        override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-            if (button == Input.Buttons.LEFT) {
-//                println("x:" + screenX + "y:" +screenY)
-                onSelectX = screenX / 50
-                onSelectY = (1000 - screenY) / 50
-                return true
-            }
-            return false
-        }
-
-        override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-            return false
-        }
-
-        override fun touchCancelled(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-            return false
-        }
-
-        override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-            return false
-        }
-
-        override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-            return false
-        }
-
-        override fun scrolled(amountX: Float, amountY: Float): Boolean {
-            return false
-        }
-    }
-
     override fun create() {
         font = BitmapFont()
         font.setColor(1f, 1f, 1f, 1f)
@@ -115,23 +61,24 @@ object ClientMain : ApplicationAdapter() {
         Gdx.input.inputProcessor = multiplexer
         multiplexer.addProcessor(stage)
         multiplexer.addProcessor(MyInputProcessor)
-        playerName = TextField("", InputTextFileStyle)
-        playerName.setSize(400f, 100f)
-        playerName.setPosition(300f, 500f)
-        playerName.alignment = Align.center
-        playerName.messageText = "Please Enter Player Name"
-        stage.addActor(playerName)
+        playerNameField = TextField("", InputTextFileStyle)
+        playerNameField.setSize(400f, 100f)
+        playerNameField.setPosition(300f, 500f)
+        playerNameField.alignment = Align.center
+        playerNameField.messageText = "Please Enter Player Name"
+        stage.addActor(playerNameField)
         startButton = Button(StartButtonStyle)
         startButton.setSize(400f, 100f)
         startButton.setPosition(300f, 200f)
         startButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 println("按钮被点击")
-                dataHandler.player = Player(playerName.text.toString())
+                playerName = playerNameField.text
+                dataHandler.player = Player(playerName)
                 dataHandler.gameReady()
                 startButton.touchable = Touchable.disabled
-                playerName.touchable = Touchable.disabled
-                playerName.isDisabled = true
+                playerNameField.touchable = Touchable.disabled
+                playerNameField.isDisabled = true
             }
         })
         stage.addActor(startButton)
@@ -169,7 +116,6 @@ object ClientMain : ApplicationAdapter() {
                 for (grid in toDrawGridList) {
                     val x: Float = grid.x * 50 + 1f
                     val y: Float = grid.y * 50 + 1f
-
                     if (grid is Blank) {
                         sr.begin(ShapeRenderer.ShapeType.Filled)
                         sr.setColor(Color.LIGHT_GRAY)
@@ -180,7 +126,7 @@ object ClientMain : ApplicationAdapter() {
                         batch.draw(mountain, x, y)
                         batch.end()
                     } else if (grid is King) {
-                        if (grid.player.name == playerName.text) {
+                        if (grid.player.name == playerNameField.text) {
                             sr.begin(ShapeRenderer.ShapeType.Filled)
                             sr.setColor(Color.BLUE)
                             sr.rect(x,y,48f,48f)
@@ -221,11 +167,11 @@ object ClientMain : ApplicationAdapter() {
                 val y = onSelectY*50f+2
                 batch.begin()
 //            println("x:"+x+"y:"+y)
-                if (trueSelect) {
-                    batch.draw(selection_2, x, y)
-                } else {
+//                if (trueSelect) {
+//                    batch.draw(selection_2, x, y)
+//                } else {
                     batch.draw(selection, x, y)
-                }
+//                }
                 batch.end()
             } catch (e: RuntimeException) {
                 System.err.println(e)
