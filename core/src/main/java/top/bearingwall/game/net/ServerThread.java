@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class ServerThread extends Thread {
     private final Socket socket;
-    private int playerIndex = 0;
+    private int playerIndex;
     ObjectOutputStream oos;
     ObjectInputStream ois;
 
@@ -32,6 +32,7 @@ public class ServerThread extends Thread {
                 if (data instanceof Player) {
                     synchronized (playerMap) {
                         var clientPlayer = (Player) data;
+                        clientPlayer.setId(playerIndex);
                         playerMap.put(playerIndex, clientPlayer);
                         if (!ServerMain.INSTANCE.isGameOpen()) {
                             // 设置玩家King位置
@@ -64,9 +65,7 @@ public class ServerThread extends Thread {
 
     public void sendMap() throws IOException {
         var grids = GameMap.getGrids();
-        if (oos != null) {
-            oos.reset();
-        }
+        if (oos != null) oos.reset();
         oos.writeObject(grids);
         System.out.println(currentThread().getName() + ": 已发送GameMap");
         oos.flush();
@@ -79,4 +78,9 @@ public class ServerThread extends Thread {
         oos.flush();
     }
 
+    public void sendId(int id) throws IOException {
+        oos.writeObject(id);
+        System.out.println(currentThread().getName() + ": 已发送id" + id);
+        oos.flush();
+    }
 }

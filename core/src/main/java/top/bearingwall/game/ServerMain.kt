@@ -58,6 +58,7 @@ object ServerMain {
             for (x in 0..<clients.size) {
                 val client = clients[x]
                 client!!.sendMap()
+                client.sendId(x)
             }
             while (!isGameOpen) {
                 sleep(500)
@@ -130,6 +131,7 @@ object ServerMain {
                                     grids[m.originX][m.originY].power = 1
                                 } else {
                                     val endNowPower = oriPrePower-1-endPrePower
+                                    // TODO: 胜利判定
                                     grids[m.originX][m.originY].power = 1
                                     grids[endX][endY] = Tower(grids[m.originX][m.originY].player,endNowPower,endX,endY)
                                 }
@@ -155,7 +157,7 @@ object ServerMain {
                                 }
                             }
                         }
-                    } else if (!(grids[endX][endY] is Mountain)) {
+                    } else if (grids[endX][endY] !is Mountain) {
                         if (grids[endX][endY].player.name == m.playerName) {
                             // 自己的格子
                             val endPrePower = grids[endX][endY].power
@@ -163,8 +165,7 @@ object ServerMain {
                             grids[endX][endY].power = endPrePower + oriPrePower - 1
                             grids[m.originX][m.originY].power = 1
                         } else {
-                            // TODO: 敌人的格子
-                            // 敌人的King
+                            // 敌人的格子
                             val endPrePower = grids[endX][endY].power
                             val oriPrePower = grids[m.originX][m.originY].power
                             if (endPrePower >= oriPrePower) {

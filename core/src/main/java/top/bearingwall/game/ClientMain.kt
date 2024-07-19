@@ -31,7 +31,6 @@ object ClientMain : ApplicationAdapter() {
     var toDrawGridList: LinkedList<Grid> = LinkedList()
     var onSelectX = 0
     var onSelectY = 0
-//    var trueSelect = false
 
     private lateinit var stage: Stage
     private lateinit var playerNameField: TextField
@@ -46,6 +45,8 @@ object ClientMain : ApplicationAdapter() {
     private lateinit var mountain: Texture
     private lateinit var tower: Texture
     private lateinit var selection: Texture
+    private lateinit var win: Texture
+    private lateinit var lose: Texture
 
     var mapUpdateFlag = false
 
@@ -73,7 +74,7 @@ object ClientMain : ApplicationAdapter() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 println("按钮被点击")
                 playerName = playerNameField.text
-                dataHandler.player = Player(playerName)
+                dataHandler.player = Player(playerName,0)
                 dataHandler.gameReady()
                 startButton.touchable = Touchable.disabled
                 playerNameField.touchable = Touchable.disabled
@@ -89,6 +90,8 @@ object ClientMain : ApplicationAdapter() {
         mountain = Texture("mountain.png")
         tower = Texture("tower.png")
         selection = Texture("selection.png")
+        win = Texture("win.png")
+        lose = Texture("lose.png")
     }
 
     override fun render() {
@@ -124,14 +127,19 @@ object ClientMain : ApplicationAdapter() {
                         batch.draw(mountain, x, y)
                         batch.end()
                     } else if (grid is King) {
-                        if (grid.player.name == playerNameField.text) {
+                        if (grid.player.id == 0) {
                             sr.begin(ShapeRenderer.ShapeType.Filled)
                             sr.setColor(Color.BLUE)
                             sr.rect(x,y,48f,48f)
                             sr.end()
-                        } else {
+                        } else if (grid.player.id == 1) {
                             sr.begin(ShapeRenderer.ShapeType.Filled)
                             sr.setColor(Color.RED)
+                            sr.rect(x,y,48f,48f)
+                            sr.end()
+                        } else if (grid.player.id == 2) {
+                            sr.begin(ShapeRenderer.ShapeType.Filled)
+                            sr.setColor(Color.FOREST)
                             sr.rect(x,y,48f,48f)
                             sr.end()
                         }
@@ -145,9 +153,19 @@ object ClientMain : ApplicationAdapter() {
                             sr.setColor(Color.LIGHT_GRAY)
                             sr.rect(x,y,48f,48f)
                             sr.end()
-                        } else if (grid.player.name == ClientMain.playerName) {
+                        } else if (grid.player.id == 0) {
                             sr.begin(ShapeRenderer.ShapeType.Filled)
                             sr.setColor(Color.BLUE)
+                            sr.rect(x,y,48f,48f)
+                            sr.end()
+                        } else if (grid.player.id == 1) {
+                            sr.begin(ShapeRenderer.ShapeType.Filled)
+                            sr.setColor(Color.RED)
+                            sr.rect(x,y,48f,48f)
+                            sr.end()
+                        } else if (grid.player.id == 2) {
+                            sr.begin(ShapeRenderer.ShapeType.Filled)
+                            sr.setColor(Color.FOREST)
                             sr.rect(x,y,48f,48f)
                             sr.end()
                         }
@@ -156,7 +174,7 @@ object ClientMain : ApplicationAdapter() {
                         font.draw(batch, grid.power.toString(), x+12, y+28)
                         batch.end()
                     } else {
-                        if (grid.player.name == playerName) {
+                        if (grid.player.id == 0) {
                             sr.begin(ShapeRenderer.ShapeType.Filled)
                             sr.setColor(Color.BLUE)
                             sr.rect(x,y,48f,48f)
@@ -164,9 +182,17 @@ object ClientMain : ApplicationAdapter() {
                             batch.begin()
                             font.draw(batch, grid.power.toString(), x+12, y+28)
                             batch.end()
-                        } else {
+                        } else if (grid.player.id == 1) {
                             sr.begin(ShapeRenderer.ShapeType.Filled)
                             sr.setColor(Color.RED)
+                            sr.rect(x,y,48f,48f)
+                            sr.end()
+                            batch.begin()
+                            font.draw(batch, grid.power.toString(), x+12, y+28)
+                            batch.end()
+                        } else if (grid.player.id == 2) {
+                            sr.begin(ShapeRenderer.ShapeType.Filled)
+                            sr.setColor(Color.FOREST)
                             sr.rect(x,y,48f,48f)
                             sr.end()
                             batch.begin()
@@ -202,6 +228,8 @@ object ClientMain : ApplicationAdapter() {
         mountain.dispose()
         tower.dispose()
         selection.dispose()
+        win.dispose()
+        lose.dispose()
         System.exit(0)
     }
 }

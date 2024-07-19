@@ -1,5 +1,6 @@
 package top.bearingwall.game.net;
 
+import top.bearingwall.game.ClientMain;
 import top.bearingwall.game.util.ClientDataHandler;
 import top.bearingwall.game.data.GameMap;
 import top.bearingwall.game.data.Grid;
@@ -33,6 +34,11 @@ public class ClientThread extends Thread {
                         System.out.println("已收到GameMap");
                         GameMap.setGrids((Grid[][]) data);
                         isMapReceived = true;
+                    }
+                    data = ois.readObject();
+                    if (data instanceof Integer) {
+                        ClientDataHandler.INSTANCE.setId(((Integer) data));
+                        System.out.println("设置ID为" + ClientDataHandler.INSTANCE.getId());
                     }
                 }
             }
