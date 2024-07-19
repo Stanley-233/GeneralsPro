@@ -10,11 +10,8 @@
 ### 服务端
 1. 处理战力计算
 
-### 移动逻辑
-trueSelected -> WASD
-
 ## 加分
 - 云服务器 +5
 - 回放 +5
 - 音效 +5
-- JFreeChart
+- JFreeChart +5

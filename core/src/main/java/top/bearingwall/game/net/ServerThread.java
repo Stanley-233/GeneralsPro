@@ -43,7 +43,7 @@ public class ServerThread extends Thread {
                             grids[x][y] = new King(clientPlayer,1,x,y);
                             GameMap.setGrids(grids);
                         }
-                        if (playerMap.size() == 2) {
+                        if (playerMap.size() == 3) {
                             System.out.println(currentThread().getName() + ": 游戏开始");
                             playerMap.notifyAll();
                         } else {

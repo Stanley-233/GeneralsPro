@@ -55,6 +55,11 @@ object ServerMain {
             clients.put(1,thread1)
             thread1.start()
             println("Main: 客户端1连接成功！")
+            val client2 = serverSocket.accept()
+            val thread2 = ServerThread(client2, 2)
+            clients.put(2,thread2)
+            thread2.start()
+            println("Main: 客户端2连接成功！")
             sleep(500)
             for (x in 0..<clients.size) {
                 val client = clients[x]
