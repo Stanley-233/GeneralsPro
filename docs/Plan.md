@@ -12,3 +12,9 @@
 
 ### 移动逻辑
 trueSelected -> WASD
+
+## 加分
+- 云服务器 +5
+- 回放 +5
+- 音效 +5
+- JFreeChart

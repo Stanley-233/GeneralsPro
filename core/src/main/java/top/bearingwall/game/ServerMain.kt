@@ -131,7 +131,6 @@ object ServerMain {
                                     grids[m.originX][m.originY].power = 1
                                 } else {
                                     val endNowPower = oriPrePower-1-endPrePower
-                                    // TODO: 胜利判定
                                     val winner = grids[m.originX][m.originY].player
                                     val loser = grids[endX][endY].player
                                     clients.get(winner.id)?.sendString("win")
