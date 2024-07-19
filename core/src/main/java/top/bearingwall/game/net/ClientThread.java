@@ -50,6 +50,10 @@ public class ClientThread extends Thread {
                 } else if (data instanceof Integer) {
                     ClientDataHandler.INSTANCE.setTurnCounter((Integer) data);
                     System.out.println("当前回合数：" + data);
+                } else if (data instanceof String) {
+                    System.out.println("收到消息：" + data);
+                    ClientDataHandler.INSTANCE.setGameEndType((String) data);
+                    ClientDataHandler.INSTANCE.setGameEnd(true);
                 }
                 if (isMapReceived) {
                     ClientDataHandler.INSTANCE.calculateMap();

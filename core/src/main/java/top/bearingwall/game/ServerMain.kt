@@ -17,6 +17,7 @@ object ServerMain {
     var moveList = LinkedList<Move>()
     var isGameOpen: Boolean = false
     var turnCount: Int = 0
+    var gameEnd = false
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -64,7 +65,7 @@ object ServerMain {
                 sleep(500)
             }
             println("main: 游戏已开始")
-            while (true) {
+            while (!gameEnd) {
                 nextTurn()
                 for (x in 0..<clients.size) {
                     val client = clients[x]
@@ -97,7 +98,6 @@ object ServerMain {
             }
             try {
                 for (m in moveList) {
-                    // TODO: movement handler
                     if (grids[m.originX][m.originY].power == 1) {
                         moveList.remove(m)
                         continue
@@ -132,8 +132,13 @@ object ServerMain {
                                 } else {
                                     val endNowPower = oriPrePower-1-endPrePower
                                     // TODO: 胜利判定
+                                    val winner = grids[m.originX][m.originY].player
+                                    val loser = grids[endX][endY].player
+                                    clients.get(winner.id)?.sendString("win")
+                                    clients.get(loser.id)?.sendString("lose")
                                     grids[m.originX][m.originY].power = 1
                                     grids[endX][endY] = Tower(grids[m.originX][m.originY].player,endNowPower,endX,endY)
+                                    gameEnd = true
                                 }
                             }
                         } else {

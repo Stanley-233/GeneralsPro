@@ -83,4 +83,10 @@ public class ServerThread extends Thread {
         System.out.println(currentThread().getName() + ": 已发送id" + id);
         oos.flush();
     }
+
+    public void sendString(String str) throws IOException {
+        oos.writeObject(str);
+        System.out.println(currentThread().getName() + ": 已发送消息" + str);
+        oos.flush();
+    }
 }

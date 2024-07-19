@@ -212,6 +212,16 @@ object ClientMain : ApplicationAdapter() {
                 batch.begin()
                 batch.draw(selection, x, y)
                 batch.end()
+                // if game end
+                batch.begin()
+                if (dataHandler.isGameEnd) {
+                    if (dataHandler.gameEndType == "win") {
+                        batch.draw(win, 300f, 300f)
+                    } else if (dataHandler.gameEndType == "lose") {
+                        batch.draw(lose, 300f, 300f)
+                    }
+                }
+                batch.end()
             } catch (e: RuntimeException) {
                 System.err.println(e)
             }

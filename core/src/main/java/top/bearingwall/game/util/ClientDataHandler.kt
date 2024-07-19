@@ -11,6 +11,8 @@ object ClientDataHandler {
     var isGameStarted = false
     var turnCounter = 0
     var id: Int = -2
+    var isGameEnd = false
+    var gameEndType = ""
 
     fun gameReady() {
         ClientThread().start()

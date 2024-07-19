@@ -30,10 +30,6 @@ object MyInputProcessor : InputProcessor {
                     ClientDataHandler.setMove(1,x,y)
                     return true
                 }
-//                else if (!ClientMain.trueSelect) {
-//                    ClientMain.onSelectY++
-//                    return true
-//                }
                 return false
             }
             Input.Keys.A -> {
@@ -42,10 +38,6 @@ object MyInputProcessor : InputProcessor {
                     ClientDataHandler.setMove(2,x,y)
                     return true
                 }
-//                else if (!ClientMain.trueSelect) {
-//                    ClientMain.onSelectX--
-//                    return true
-//                }
                 return false
             }
             Input.Keys.S -> {
@@ -54,10 +46,6 @@ object MyInputProcessor : InputProcessor {
                     ClientDataHandler.setMove(3,x,y)
                     return true
                 }
-//                else if (!ClientMain.trueSelect) {
-//                    ClientMain.onSelectY--
-//                    return true
-//                }
                 return false
             }
             Input.Keys.D -> {
@@ -66,20 +54,8 @@ object MyInputProcessor : InputProcessor {
                     ClientDataHandler.setMove(4,x,y)
                     return true
                 }
-//                else if (!ClientMain.trueSelect) {
-//                    ClientMain.onSelectX++
-//                    return true
-//                }
                 return false
             }
-//            Input.Keys.ENTER -> {
-//                if (ClientMain.trueSelect) {
-//                    ClientMain.trueSelect = false
-//                } else {
-//                    ClientMain.trueSelect = true
-//                }
-//                return true
-//            }
         }
         return false
     }
