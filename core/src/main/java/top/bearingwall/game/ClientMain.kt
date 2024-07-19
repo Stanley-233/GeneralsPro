@@ -1,8 +1,10 @@
 package top.bearingwall.game
 
-import com.badlogic.gdx.ApplicationAdapter
+import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.audio.Music
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -24,7 +26,7 @@ import top.bearingwall.game.util.ClientDataHandler
 import top.bearingwall.game.util.MyInputProcessor
 import java.util.*
 
-object ClientMain : ApplicationAdapter() {
+object ClientMain : Game() {
     private val dataHandler = ClientDataHandler
     var currentMove: Move? = null
     var playerName = "Default"
@@ -47,6 +49,11 @@ object ClientMain : ApplicationAdapter() {
     private lateinit var selection: Texture
     private lateinit var win: Texture
     private lateinit var lose: Texture
+    lateinit var bgm: Music
+    lateinit var readySound: Sound
+    lateinit var loseSound: Sound
+    lateinit var winSound: Sound
+    private var gameEndSoundPlayed: Boolean = false
 
     var mapUpdateFlag = false
 
@@ -92,6 +99,15 @@ object ClientMain : ApplicationAdapter() {
         selection = Texture("selection.png")
         win = Texture("win.png")
         lose = Texture("lose.png")
+
+        bgm = Gdx.audio.newMusic(Gdx.files.internal("bgm.ogg"))
+        bgm.volume = 0.3f
+        bgm.isLooping = true
+        bgm.play()
+
+        readySound = Gdx.audio.newSound(Gdx.files.internal("ready.ogg"))
+        loseSound = Gdx.audio.newSound(Gdx.files.internal("lose.ogg"))
+        winSound = Gdx.audio.newSound(Gdx.files.internal("win.ogg"))
     }
 
     override fun render() {
@@ -215,6 +231,7 @@ object ClientMain : ApplicationAdapter() {
                 // if game end
                 batch.begin()
                 if (dataHandler.isGameEnd) {
+                    playGameEndSound()
                     if (dataHandler.gameEndType == "win") {
                         batch.draw(win, 300f, 300f)
                     } else if (dataHandler.gameEndType == "lose") {
@@ -240,6 +257,21 @@ object ClientMain : ApplicationAdapter() {
         selection.dispose()
         win.dispose()
         lose.dispose()
+        bgm.dispose()
+        readySound.dispose()
+        winSound.dispose()
+        loseSound.dispose()
         System.exit(0)
+    }
+
+    fun playGameEndSound() {
+        if (gameEndSoundPlayed) return
+        bgm.stop()
+        if (dataHandler.gameEndType == "win") {
+            winSound.play()
+        } else {
+            loseSound.play()
+        }
+        gameEndSoundPlayed = true
     }
 }

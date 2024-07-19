@@ -42,6 +42,7 @@ public class ClientThread extends Thread {
                     }
                 }
             }
+            ClientMain.INSTANCE.getReadySound().play();
             while (true) {
                 var data = ois.readObject();
                 if (data instanceof Grid[][]) {
