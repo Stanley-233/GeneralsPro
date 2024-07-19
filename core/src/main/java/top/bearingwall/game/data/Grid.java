@@ -1,10 +1,8 @@
 package top.bearingwall.game.data;
 
-import lombok.Data;
 
 import java.io.Serializable;
 
-@Data
 public class Grid implements Serializable {
     private Player player;
     private int power;

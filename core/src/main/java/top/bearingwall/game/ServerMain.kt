@@ -1,6 +1,5 @@
 package top.bearingwall.game
 
-import lombok.SneakyThrows
 import top.bearingwall.game.data.*
 import top.bearingwall.game.data.GameMap.grids
 import top.bearingwall.game.net.Move
@@ -11,6 +10,7 @@ import java.util.*
 
 object ServerMain {
     val clients = HashMap<Int,ServerThread>()
+    @get:Synchronized
     val playerMap = HashMap<Int,Player>()
     @get:Synchronized
     @set:Synchronized
@@ -18,7 +18,6 @@ object ServerMain {
     var isGameOpen: Boolean = false
     var turnCount: Int = 0
 
-    @SneakyThrows
     @JvmStatic
     fun main(args: Array<String>) {
         println("服务器启动...")
@@ -46,15 +45,15 @@ object ServerMain {
         ServerSocket(13696).use { serverSocket ->
             println("main: 等待连接客户端0...")
             val client0 = serverSocket.accept()
-            val thread0 = ServerThread(client0, playerMap)
+            val thread0 = ServerThread(client0, 0)
             clients.put(0,thread0)
             thread0.start()
             println("main: 客户端0连接成功，等待连接客户端1...")
-//            val client1 = serverSocket.accept()
-//            val thread1 = ServerThread(client1, playerMap)
-//            clients.put(1,thread1)
-//            thread1.start()
-//            println("Main: 客户端1连接成功！")
+            val client1 = serverSocket.accept()
+            val thread1 = ServerThread(client1, 1)
+            clients.put(1,thread1)
+            thread1.start()
+            println("Main: 客户端1连接成功！")
             sleep(500)
             for (x in 0..<clients.size) {
                 val client = clients[x]
@@ -122,6 +121,18 @@ object ServerMain {
                                 val oriPrePower = grids[m.originX][m.originY].power
                                 grids[endX][endY] = King(grids[m.originX][m.originY].player,endPrePower + oriPrePower - 1,endX,endY)
                                 grids[m.originX][m.originY].power = 1
+                            } else {
+                                // 敌人的King
+                                val endPrePower = grids[endX][endY].power
+                                val oriPrePower = grids[m.originX][m.originY].power
+                                if (endPrePower >= oriPrePower) {
+                                    grids[endX][endY].power -= (oriPrePower-1)
+                                    grids[m.originX][m.originY].power = 1
+                                } else {
+                                    val endNowPower = oriPrePower-1-endPrePower
+                                    grids[m.originX][m.originY].power = 1
+                                    grids[endX][endY] = Tower(grids[m.originX][m.originY].player,endNowPower,endX,endY)
+                                }
                             }
                         } else {
                             // 自家塔
@@ -152,7 +163,18 @@ object ServerMain {
                             grids[endX][endY].power = endPrePower + oriPrePower - 1
                             grids[m.originX][m.originY].power = 1
                         } else {
-
+                            // TODO: 敌人的格子
+                            // 敌人的King
+                            val endPrePower = grids[endX][endY].power
+                            val oriPrePower = grids[m.originX][m.originY].power
+                            if (endPrePower >= oriPrePower) {
+                                grids[endX][endY].power -= (oriPrePower-1)
+                                grids[m.originX][m.originY].power = 1
+                            } else {
+                                val endNowPower = oriPrePower-1-endPrePower
+                                grids[m.originX][m.originY].power = 1
+                                grids[endX][endY] = Grid(grids[m.originX][m.originY].player,endNowPower,endX,endY)
+                            }
                         }
                     }
                     // Mountain 无需判断

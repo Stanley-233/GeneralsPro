@@ -156,13 +156,24 @@ object ClientMain : ApplicationAdapter() {
                         font.draw(batch, grid.power.toString(), x+12, y+28)
                         batch.end()
                     } else {
-                        sr.begin(ShapeRenderer.ShapeType.Filled)
-                        sr.setColor(Color.BLUE)
-                        sr.rect(x,y,48f,48f)
-                        sr.end()
-                        batch.begin()
-                        font.draw(batch, grid.power.toString(), x+12, y+28)
-                        batch.end()
+                        if (grid.player.name == playerName) {
+                            sr.begin(ShapeRenderer.ShapeType.Filled)
+                            sr.setColor(Color.BLUE)
+                            sr.rect(x,y,48f,48f)
+                            sr.end()
+                            batch.begin()
+                            font.draw(batch, grid.power.toString(), x+12, y+28)
+                            batch.end()
+                        } else {
+                            sr.begin(ShapeRenderer.ShapeType.Filled)
+                            sr.setColor(Color.RED)
+                            sr.rect(x,y,48f,48f)
+                            sr.end()
+                            batch.begin()
+                            font.draw(batch, grid.power.toString(), x+12, y+28)
+                            batch.end()
+                        }
+
                     }
                 }
                 // draw selection
@@ -191,5 +202,6 @@ object ClientMain : ApplicationAdapter() {
         mountain.dispose()
         tower.dispose()
         selection.dispose()
+        System.exit(0)
     }
 }

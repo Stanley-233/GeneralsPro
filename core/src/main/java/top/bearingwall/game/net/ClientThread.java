@@ -1,14 +1,11 @@
 package top.bearingwall.game.net;
 
-import lombok.Getter;
-import lombok.Setter;
 import top.bearingwall.game.util.ClientDataHandler;
 import top.bearingwall.game.data.GameMap;
 import top.bearingwall.game.data.Grid;
 
 import java.io.*;
 import java.net.Socket;
-import javax.swing.JOptionPane;
 
 public class ClientThread extends Thread {
     private boolean isMapReceived = false;
