@@ -2,6 +2,7 @@ package top.bearingwall.game.util
 
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
+import com.badlogic.gdx.scenes.scene2d.Touchable
 import top.bearingwall.game.ClientMain
 import top.bearingwall.game.data.GameMap
 
@@ -79,6 +80,7 @@ object MyInputProcessor : InputProcessor {
                 // TODO: 游戏结束，回放按钮
                 println("回放按钮被点击")
                 ClientDataHandler.replayStarted = true
+                ClientDataHandler.startReplay()
             }
         }
         return false

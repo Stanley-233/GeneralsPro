@@ -5,10 +5,7 @@ import top.bearingwall.game.data.Grid;
 import top.bearingwall.game.data.Tower;
 
 import java.io.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class DatabaseThread extends Thread {
     Connection con;
@@ -22,7 +19,7 @@ public class DatabaseThread extends Thread {
             con = DriverManager.getConnection("jdbc:sqlite:generals.db");
             String createTableSql = "CREATE TABLE IF NOT EXISTS " + tableName + " (turn INTEGER PRIMARY KEY, tower INTEGER, power INTEGER, map BLOB)";
             con.createStatement().executeUpdate(createTableSql);
-            String cleanSql = "TRUNCATE TABLE " + tableName;
+            String cleanSql = "DELETE FROM " + tableName;
             con.createStatement().executeUpdate(cleanSql);
             wait();
         } catch (Exception e) {
@@ -54,6 +51,31 @@ public class DatabaseThread extends Thread {
         byte[] serializedData = serialize(grids);
         pstmt.setBytes(4, serializedData);
         pstmt.executeUpdate();
+    }
+
+    public Grid[][] readMap(int turn) throws SQLException, IOException {
+        String sql = "SELECT map FROM " + tableName + " WHERE turn = ?";
+        PreparedStatement pstmt = con.prepareStatement(sql);
+        pstmt.setInt(1, turn);
+        ResultSet rs = pstmt.executeQuery();
+        byte[] mapBlob = rs.getBytes("map");
+        return deserialize(mapBlob);
+    }
+
+    public int readTower(int turn) throws SQLException, IOException {
+        String sql = "SELECT tower FROM " + tableName + " WHERE turn = ?";
+        PreparedStatement pstmt = con.prepareStatement(sql);
+        pstmt.setInt(1, turn);
+        ResultSet rs = pstmt.executeQuery();
+        return rs.getInt("tower");
+    }
+
+    public int readPower(int turn) throws SQLException, IOException {
+        String sql = "SELECT power FROM " + tableName + " WHERE turn = ?";
+        PreparedStatement pstmt = con.prepareStatement(sql);
+        pstmt.setInt(1, turn);
+        ResultSet rs = pstmt.executeQuery();
+        return rs.getInt("power");
     }
 
     private static byte[] serialize(Object obj) throws IOException {

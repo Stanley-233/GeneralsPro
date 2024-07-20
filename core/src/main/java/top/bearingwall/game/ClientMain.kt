@@ -3,7 +3,6 @@ package top.bearingwall.game
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
@@ -54,8 +53,10 @@ object ClientMain : Game() {
 
     lateinit var bgm: Music
     lateinit var readySound: Sound
-    lateinit var loseSound: Sound
-    lateinit var winSound: Sound
+    lateinit var readySound_2: Sound
+    private lateinit var loseSound: Sound
+    private lateinit var winSound: Sound
+    lateinit var replaySound: Sound
     var gameEndSoundPlayed: Boolean = false
 
     var mapUpdateFlag = false
@@ -110,21 +111,19 @@ object ClientMain : Game() {
         bgm.play()
 
         readySound = Gdx.audio.newSound(Gdx.files.internal("ready.ogg"))
+        readySound_2 = Gdx.audio.newSound(Gdx.files.internal("ready_2.ogg"))
         loseSound = Gdx.audio.newSound(Gdx.files.internal("lose.ogg"))
         winSound = Gdx.audio.newSound(Gdx.files.internal("win.ogg"))
+        replaySound = Gdx.audio.newSound(Gdx.files.internal("replay.ogg"))
     }
 
     override fun render() {
         ScreenUtils.clear(0.255f, 0.255f, 0.255f, 1f)
         if (dataHandler.isGameStarted) {
-            if (!dataHandler.replayStarted) {
-                batch.begin()
-                batch.draw(background, 0f, 0f)
-                batch.end()
-                drawMap(mapUpdateFlag)
-            } else {
-                //TODO: replay
-            }
+            batch.begin()
+            batch.draw(background, 0f, 0f)
+            batch.end()
+            drawMap(mapUpdateFlag)
         } else {
             batch.begin()
             batch.draw(title, 260f, 750f)
@@ -239,12 +238,14 @@ object ClientMain : Game() {
                 batch.begin()
                 if (dataHandler.isGameEnd) {
                     playGameEndSound()
-                    if (dataHandler.gameEndType == "win") {
-                        batch.draw(win, 300f, 300f)
-                    } else if (dataHandler.gameEndType == "lose") {
-                        batch.draw(lose, 300f, 300f)
+                    if (!dataHandler.replayStarted) {
+                        if (dataHandler.gameEndType == "win") {
+                            batch.draw(win, 300f, 300f)
+                        } else if (dataHandler.gameEndType == "lose") {
+                            batch.draw(lose, 300f, 300f)
+                        }
+                        batch.draw(replayButton,300f,200f)
                     }
-                    batch.draw(replayButton,300f,200f)
                 }
                 batch.end()
             } catch (e: RuntimeException) {
@@ -263,12 +264,16 @@ object ClientMain : Game() {
         mountain.dispose()
         tower.dispose()
         selection.dispose()
+
         win.dispose()
         lose.dispose()
         bgm.dispose()
+
         readySound.dispose()
+        readySound_2.dispose()
         winSound.dispose()
         loseSound.dispose()
+        replaySound.dispose()
         System.exit(0)
     }
 

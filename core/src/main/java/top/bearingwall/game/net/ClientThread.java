@@ -8,6 +8,7 @@ import top.bearingwall.game.util.DatabaseThread;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ClientThread extends Thread {
     private boolean isMapReceived = false;
@@ -44,6 +45,7 @@ public class ClientThread extends Thread {
                 }
             }
             ClientMain.INSTANCE.getReadySound().play();
+            ClientMain.INSTANCE.getReadySound_2().play();
             ClientDataHandler.databaseThread = new DatabaseThread();
             ClientDataHandler.databaseThread.start();
             while (true) {
@@ -61,17 +63,11 @@ public class ClientThread extends Thread {
                     ClientDataHandler.INSTANCE.setGameEnd(true);
                 }
                 if (isMapReceived) {
-                    if (ClientDataHandler.INSTANCE.getReplayStarted()) {
-                        connection.close();
-                        ClientDataHandler.replayThread = new ReplayThread();
-                        ClientDataHandler.replayThread.start();
-                        this.interrupt();
-                    } else {
-                        ClientDataHandler.INSTANCE.calculateMap();
-                    }
+                    ClientDataHandler.INSTANCE.calculateMap();
                 }
             }
-
+        } catch (SocketException e) {
+            System.err.println(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }

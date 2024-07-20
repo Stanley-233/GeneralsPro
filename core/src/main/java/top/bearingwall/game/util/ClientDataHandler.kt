@@ -4,8 +4,6 @@ import top.bearingwall.game.ClientMain
 import top.bearingwall.game.data.*
 import top.bearingwall.game.net.ClientThread
 import top.bearingwall.game.net.Move
-import top.bearingwall.game.net.ReplayThread
-import javax.swing.plaf.basic.BasicComboBoxUI.ListDataHandler
 
 object ClientDataHandler {
     var player: Player? = null
@@ -18,6 +16,14 @@ object ClientDataHandler {
     lateinit var clientThread: ClientThread
     lateinit var replayThread: ReplayThread
     lateinit var databaseThread: DatabaseThread
+
+    fun startReplay() {
+        clientThread.interrupt()
+        println("clientThread已停止")
+        replayThread = ReplayThread()
+        replayThread.start()
+        println("回放线程已启动")
+    }
 
     fun gameReady() {
         clientThread = ClientThread()
@@ -73,6 +79,8 @@ object ClientDataHandler {
 
     fun setMove(type: Int, x: Int, y: Int) {
         ClientMain.currentMove = Move(ClientMain.playerName,type, x, y)
-        ClientThread.sendMove(ClientMain.currentMove)
+        if (!replayStarted) {
+            ClientThread.sendMove(ClientMain.currentMove)
+        }
     }
 }
