@@ -4,6 +4,8 @@ import top.bearingwall.game.ClientMain
 import top.bearingwall.game.data.*
 import top.bearingwall.game.net.ClientThread
 import top.bearingwall.game.net.Move
+import top.bearingwall.game.net.ReplayThread
+import javax.swing.plaf.basic.BasicComboBoxUI.ListDataHandler
 
 object ClientDataHandler {
     var player: Player? = null
@@ -12,9 +14,14 @@ object ClientDataHandler {
     var id: Int = -2
     var isGameEnd = false
     var gameEndType = ""
+    var replayStarted = false
+    lateinit var clientThread: ClientThread
+    lateinit var replayThread: ReplayThread
+    lateinit var databaseThread: DatabaseThread
 
     fun gameReady() {
-        ClientThread().start()
+        clientThread = ClientThread()
+        clientThread.start()
     }
 
     fun calculateMap() {
@@ -51,6 +58,16 @@ object ClientDataHandler {
             }
         }
         ClientMain.toDrawGridList.distinct()
+        ClientMain.mapUpdateFlag = true
+    }
+
+    fun calculateReplayMap() {
+        ClientMain.toDrawGridList.clear()
+        for (i in 0..19) {
+            for (j in 0..19) {
+                GameMap.grids[i][j]?.let { ClientMain.toDrawGridList.add(it) }
+            }
+        }
         ClientMain.mapUpdateFlag = true
     }
 

@@ -4,6 +4,7 @@ import top.bearingwall.game.ClientMain;
 import top.bearingwall.game.util.ClientDataHandler;
 import top.bearingwall.game.data.GameMap;
 import top.bearingwall.game.data.Grid;
+import top.bearingwall.game.util.DatabaseThread;
 
 import java.io.*;
 import java.net.Socket;
@@ -43,6 +44,8 @@ public class ClientThread extends Thread {
                 }
             }
             ClientMain.INSTANCE.getReadySound().play();
+            ClientDataHandler.databaseThread = new DatabaseThread();
+            ClientDataHandler.databaseThread.start();
             while (true) {
                 var data = ois.readObject();
                 if (data instanceof Grid[][]) {
@@ -51,13 +54,21 @@ public class ClientThread extends Thread {
                 } else if (data instanceof Integer) {
                     ClientDataHandler.INSTANCE.setTurnCounter((Integer) data);
                     System.out.println("当前回合数：" + data);
+                    ClientDataHandler.databaseThread.writeData((Integer) data,GameMap.getGrids());
                 } else if (data instanceof String) {
                     System.out.println("收到消息：" + data);
                     ClientDataHandler.INSTANCE.setGameEndType((String) data);
                     ClientDataHandler.INSTANCE.setGameEnd(true);
                 }
                 if (isMapReceived) {
-                    ClientDataHandler.INSTANCE.calculateMap();
+                    if (ClientDataHandler.INSTANCE.getReplayStarted()) {
+                        connection.close();
+                        ClientDataHandler.replayThread = new ReplayThread();
+                        ClientDataHandler.replayThread.start();
+                        this.interrupt();
+                    } else {
+                        ClientDataHandler.INSTANCE.calculateMap();
+                    }
                 }
             }
 

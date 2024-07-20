@@ -69,11 +69,17 @@ object MyInputProcessor : InputProcessor {
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        val trueY = 1000 - screenY
         if (button == Input.Buttons.LEFT) {
-//                println("x:" + screenX + "y:" +screenY)
-            ClientMain.onSelectX = screenX / 50
-            ClientMain.onSelectY = (1000 - screenY) / 50
-            return true
+            if (!ClientMain.gameEndSoundPlayed) {
+                ClientMain.onSelectX = screenX / 50
+                ClientMain.onSelectY = trueY / 50
+                return true
+            } else if (screenX in 300..700 && trueY in 200..300) {
+                // TODO: 游戏结束，回放按钮
+                println("回放按钮被点击")
+                ClientDataHandler.replayStarted = true
+            }
         }
         return false
     }

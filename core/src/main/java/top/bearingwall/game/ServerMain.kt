@@ -16,8 +16,9 @@ object ServerMain {
     @set:Synchronized
     var moveList = LinkedList<Move>()
     var isGameOpen: Boolean = false
-    var turnCount: Int = 0
-    var gameEnd = false
+    private var turnCount: Int = 0
+    private var gameEnd = false
+    private var leftPlayerCount: Int = 3
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -32,7 +33,7 @@ object ServerMain {
             }
         }
         val r = Random(System.currentTimeMillis())
-        for (i in 0..49) {
+        for (i in 0..79) {
             val x = r.nextInt(20)
             val y = r.nextInt(20)
             grids[x][y] = Mountain(x, y)
@@ -86,7 +87,7 @@ object ServerMain {
 
     @Synchronized
     fun nextTurn() {
-        println("turn:" + turnCount)
+        println("turn:$turnCount")
         turnCount++
         for (x in 0..19) {
             for (y in 0..19) {
@@ -136,13 +137,22 @@ object ServerMain {
                                     grids[m.originX][m.originY].power = 1
                                 } else {
                                     val endNowPower = oriPrePower-1-endPrePower
-                                    val winner = grids[m.originX][m.originY].player
-                                    val loser = grids[endX][endY].player
-                                    clients.get(winner.id)?.sendString("win")
-                                    clients.get(loser.id)?.sendString("lose")
-                                    grids[m.originX][m.originY].power = 1
-                                    grids[endX][endY] = Tower(grids[m.originX][m.originY].player,endNowPower,endX,endY)
-                                    gameEnd = true
+                                    // 三人情况下Winner
+                                    if (leftPlayerCount == 2) {
+                                        val winner = grids[m.originX][m.originY].player
+                                        val loser = grids[endX][endY].player
+                                        clients.get(winner.id)?.sendString("win")
+                                        clients.get(loser.id)?.sendString("lose")
+                                        grids[m.originX][m.originY].power = 1
+                                        grids[endX][endY] = Tower(grids[m.originX][m.originY].player,endNowPower,endX,endY)
+                                        gameEnd = true
+                                    } else {
+                                        val loser = grids[endX][endY].player
+                                        clients.get(loser.id)?.sendString("lose")
+                                        grids[m.originX][m.originY].power = 1
+                                        grids[endX][endY] = Tower(grids[m.originX][m.originY].player,endNowPower,endX,endY)
+                                        leftPlayerCount--
+                                    }
                                 }
                             }
                         } else {

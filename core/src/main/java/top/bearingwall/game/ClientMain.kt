@@ -3,6 +3,7 @@ package top.bearingwall.game
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Color
@@ -49,11 +50,13 @@ object ClientMain : Game() {
     private lateinit var selection: Texture
     private lateinit var win: Texture
     private lateinit var lose: Texture
+    private lateinit var replayButton: Texture
+
     lateinit var bgm: Music
     lateinit var readySound: Sound
     lateinit var loseSound: Sound
     lateinit var winSound: Sound
-    private var gameEndSoundPlayed: Boolean = false
+    var gameEndSoundPlayed: Boolean = false
 
     var mapUpdateFlag = false
 
@@ -79,7 +82,7 @@ object ClientMain : Game() {
         startButton.setPosition(300f, 200f)
         startButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                println("按钮被点击")
+                println("游戏开始按钮被点击")
                 playerName = playerNameField.text
                 dataHandler.player = Player(playerName,0)
                 dataHandler.gameReady()
@@ -99,9 +102,10 @@ object ClientMain : Game() {
         selection = Texture("selection.png")
         win = Texture("win.png")
         lose = Texture("lose.png")
+        replayButton = Texture("replay_button_1.png")
 
         bgm = Gdx.audio.newMusic(Gdx.files.internal("bgm.ogg"))
-        bgm.volume = 0.3f
+        bgm.volume = 0.35f
         bgm.isLooping = true
         bgm.play()
 
@@ -113,10 +117,14 @@ object ClientMain : Game() {
     override fun render() {
         ScreenUtils.clear(0.255f, 0.255f, 0.255f, 1f)
         if (dataHandler.isGameStarted) {
-            batch.begin()
-            batch.draw(background, 0f, 0f)
-            batch.end()
-            drawMap(mapUpdateFlag)
+            if (!dataHandler.replayStarted) {
+                batch.begin()
+                batch.draw(background, 0f, 0f)
+                batch.end()
+                drawMap(mapUpdateFlag)
+            } else {
+                //TODO: replay
+            }
         } else {
             batch.begin()
             batch.draw(title, 260f, 750f)
@@ -215,7 +223,6 @@ object ClientMain : Game() {
                             font.draw(batch, grid.power.toString(), x+12, y+28)
                             batch.end()
                         }
-
                     }
                 }
                 // draw selection
@@ -237,6 +244,7 @@ object ClientMain : Game() {
                     } else if (dataHandler.gameEndType == "lose") {
                         batch.draw(lose, 300f, 300f)
                     }
+                    batch.draw(replayButton,300f,200f)
                 }
                 batch.end()
             } catch (e: RuntimeException) {

@@ -9,6 +9,10 @@ dependencies {
   api "com.kotcrab.vis:vis-ui:$visUiVersion"
   api "net.onedaybeard.artemis:artemis-odb:$artemisOdbVersion"
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+  // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
+  implementation 'org.xerial:sqlite-jdbc:3.46.0.0'
+  // https://mvnrepository.com/artifact/org.jfree/jfreechart
+  implementation 'org.jfree:jfreechart:1.5.5'
 }
 repositories {
     mavenCentral()
