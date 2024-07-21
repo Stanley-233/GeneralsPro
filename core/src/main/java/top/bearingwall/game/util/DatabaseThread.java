@@ -19,8 +19,13 @@ public class DatabaseThread extends Thread {
             con = DriverManager.getConnection("jdbc:sqlite:generals.db");
             String createTableSql = "CREATE TABLE IF NOT EXISTS " + tableName + " (turn INTEGER PRIMARY KEY, tower INTEGER, power INTEGER, map BLOB)";
             con.createStatement().executeUpdate(createTableSql);
-            String cleanSql = "DELETE FROM " + tableName;
-            con.createStatement().executeUpdate(cleanSql);
+            try {
+                String cleanSql = "DELETE FROM " + tableName;
+                con.createStatement().executeUpdate(cleanSql);
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+                System.err.println(tableName + "不存在");
+            }
             wait();
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
@@ -28,7 +33,7 @@ public class DatabaseThread extends Thread {
     }
 
     public void writeData(int turn, Grid[][] grids) throws SQLException, IOException {
-        //TODO: write turn data
+        //write turn data
         int tower = 0;
         int power = 0;
         String playerName = ClientMain.INSTANCE.getPlayerName();

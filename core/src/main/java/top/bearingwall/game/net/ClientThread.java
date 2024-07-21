@@ -19,7 +19,7 @@ public class ClientThread extends Thread {
     @Override
     public void run() {
         try {
-            connection = new Socket("127.0.0.1", 13696);
+            connection = new Socket(ClientDataHandler.INSTANCE.getServerIP(), 13696);
             oos = new ObjectOutputStream(connection.getOutputStream());
             ois = new ObjectInputStream(connection.getInputStream());
             System.out.println("已连接到服务器");

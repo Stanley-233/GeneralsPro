@@ -36,6 +36,7 @@ object ClientMain : Game() {
 
     private lateinit var stage: Stage
     private lateinit var playerNameField: TextField
+    private lateinit var ipField: TextField
     private lateinit var startButton: Button
     private lateinit var font: BitmapFont
 
@@ -78,6 +79,12 @@ object ClientMain : Game() {
         playerNameField.alignment = Align.center
         playerNameField.messageText = "Please Enter Player Name"
         stage.addActor(playerNameField)
+        ipField = TextField("", InputTextFileStyle)
+        ipField.setSize(250f, 80f)
+        ipField.setPosition(375f, 360f)
+        ipField.alignment = Align.center
+        ipField.messageText = "Server IP"
+        stage.addActor(ipField)
         startButton = Button(StartButtonStyle)
         startButton.setSize(400f, 100f)
         startButton.setPosition(300f, 200f)
@@ -85,11 +92,14 @@ object ClientMain : Game() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 println("游戏开始按钮被点击")
                 playerName = playerNameField.text
+                dataHandler.serverIP = ipField.text
                 dataHandler.player = Player(playerName,0)
                 dataHandler.gameReady()
                 startButton.touchable = Touchable.disabled
                 playerNameField.touchable = Touchable.disabled
                 playerNameField.isDisabled = true
+                ipField.touchable = Touchable.disabled
+                ipField.isDisabled = true
             }
         })
         stage.addActor(startButton)

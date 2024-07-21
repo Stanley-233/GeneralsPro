@@ -7,6 +7,7 @@ import top.bearingwall.game.net.Move
 
 object ClientDataHandler {
     var player: Player? = null
+    var serverIP: String = "127.0.0.1"
     var isGameStarted = false
     var turnCounter = 0
     var id: Int = -2
