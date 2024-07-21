@@ -49,7 +49,7 @@ public class ReplayThread extends Thread {
                     try (var fos = new FileOutputStream("grid.png")) {
                         ChartUtils.writeChartAsPNG(fos, gridChart, 800, 600);
                     } catch (IOException e) {
-                        System.err.println(e.getMessage());
+                        ClientMain.INSTANCE.getLogger().error(e.getMessage());
                     }
                     // power
                     DefaultCategoryDataset powerData = new DefaultCategoryDataset();
@@ -69,14 +69,15 @@ public class ReplayThread extends Thread {
                     try (var fos = new FileOutputStream("power.png")) {
                         ChartUtils.writeChartAsPNG(fos, powerChart, 800, 600);
                     } catch (IOException e) {
-                        System.err.println(e.getMessage());
+                        ClientMain.INSTANCE.getLogger().error(e.getMessage());
                     }
+                    ReportPDF.INSTANCE.writePDF();
                     this.interrupt();
                 }
                 grid.put(currentReplayTurn,currentGrid);
                 int currentPower = ClientDataHandler.databaseThread.readPower(currentReplayTurn);
                 power.put(currentReplayTurn,currentPower);
-                System.out.println("回合数：" + currentReplayTurn + "占领格子数：" + currentGrid + "总兵力：" + currentPower);
+                ClientMain.INSTANCE.getLogger().info("回合数：" + currentReplayTurn + "占领格子数：" + currentGrid + "总兵力：" + currentPower);
                 ClientDataHandler.INSTANCE.calculateReplayMap();
                 currentReplayTurn++;
                 sleep(500);

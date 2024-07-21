@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.Logger
 import com.badlogic.gdx.utils.ScreenUtils
 import top.bearingwall.game.data.*
 import top.bearingwall.game.net.Move
@@ -60,9 +61,12 @@ object ClientMain : Game() {
     lateinit var replaySound: Sound
     var gameEndSoundPlayed: Boolean = false
 
+    val logger: Logger = Logger("ClientMain")
+
     var mapUpdateFlag = false
 
     override fun create() {
+        logger.setLevel(3)
         font = BitmapFont()
         font.setColor(1f, 1f, 1f, 1f)
         font.data.setScale(1.5f)
@@ -90,7 +94,7 @@ object ClientMain : Game() {
         startButton.setPosition(300f, 200f)
         startButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                println("游戏开始按钮被点击")
+                logger.info("开始按钮被点击")
                 playerName = playerNameField.text
                 dataHandler.serverIP = ipField.text
                 dataHandler.player = Player(playerName,0)
@@ -259,7 +263,7 @@ object ClientMain : Game() {
                 }
                 batch.end()
             } catch (e: RuntimeException) {
-                System.err.println(e)
+                logger.error(e.localizedMessage)
             }
         }
     }
@@ -284,6 +288,7 @@ object ClientMain : Game() {
         winSound.dispose()
         loseSound.dispose()
         replaySound.dispose()
+
         System.exit(0)
     }
 

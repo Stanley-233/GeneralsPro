@@ -22,12 +22,12 @@ public class DatabaseThread extends Thread {
                 String cleanSql = "DELETE FROM " + tableName;
                 con.createStatement().executeUpdate(cleanSql);
             } catch (SQLException e) {
-                System.err.println(e.getMessage());
-                System.err.println(tableName + "不存在");
+                ClientMain.INSTANCE.getLogger().info(e.getMessage());
+                ClientMain.INSTANCE.getLogger().info(tableName + "不存在");
             }
             wait();
         } catch (Exception e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            ClientMain.INSTANCE.getLogger().info(e.getClass().getName() + ": " + e.getMessage());
         }
     }
 
@@ -95,7 +95,7 @@ public class DatabaseThread extends Thread {
             ObjectInputStream ois = new ObjectInputStream(bais)) {
             return (Grid[][]) ois.readObject();
         } catch (ClassNotFoundException | NullPointerException e) {
-            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            ClientMain.INSTANCE.getLogger().info(e.getClass().getName() + ": " + e.getMessage());
         }
         return null;
     }

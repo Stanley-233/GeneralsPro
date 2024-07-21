@@ -13,6 +13,11 @@ dependencies {
   implementation 'org.xerial:sqlite-jdbc:3.46.0.0'
   // https://mvnrepository.com/artifact/org.jfree/jfreechart
   implementation 'org.jfree:jfreechart:1.5.5'
+  // https://mvnrepository.com/artifact/com.itextpdf/itextpdf
+  implementation 'com.itextpdf:itextpdf:5.5.13.4'
+// https://mvnrepository.com/artifact/com.itextpdf/itext-asian
+  implementation 'com.itextpdf:itext-asian:5.2.0'
+
 }
 repositories {
     mavenCentral()

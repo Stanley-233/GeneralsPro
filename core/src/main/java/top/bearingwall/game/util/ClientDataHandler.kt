@@ -1,6 +1,7 @@
 package top.bearingwall.game.util
 
 import top.bearingwall.game.ClientMain
+import top.bearingwall.game.ClientMain.logger
 import top.bearingwall.game.data.*
 import top.bearingwall.game.net.ClientThread
 import top.bearingwall.game.net.Move
@@ -20,10 +21,10 @@ object ClientDataHandler {
 
     fun startReplay() {
         clientThread.interrupt()
-        println("clientThread已停止")
+        logger.info("clientThread已停止")
         replayThread = ReplayThread()
         replayThread.start()
-        println("回放线程已启动")
+        logger.info("回放线程已启动")
     }
 
     fun gameReady() {
