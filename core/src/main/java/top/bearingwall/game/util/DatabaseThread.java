@@ -2,7 +2,6 @@ package top.bearingwall.game.util;
 
 import top.bearingwall.game.ClientMain;
 import top.bearingwall.game.data.Grid;
-import top.bearingwall.game.data.Tower;
 
 import java.io.*;
 import java.sql.*;
@@ -17,7 +16,7 @@ public class DatabaseThread extends Thread {
         try {
             Class.forName("org.sqlite.JDBC");
             con = DriverManager.getConnection("jdbc:sqlite:generals.db");
-            String createTableSql = "CREATE TABLE IF NOT EXISTS " + tableName + " (turn INTEGER PRIMARY KEY, tower INTEGER, power INTEGER, map BLOB)";
+            String createTableSql = "CREATE TABLE IF NOT EXISTS " + tableName + " (turn INTEGER PRIMARY KEY, grid INTEGER, power INTEGER, map BLOB)";
             con.createStatement().executeUpdate(createTableSql);
             try {
                 String cleanSql = "DELETE FROM " + tableName;
@@ -34,24 +33,24 @@ public class DatabaseThread extends Thread {
 
     public void writeData(int turn, Grid[][] grids) throws SQLException, IOException {
         //write turn data
-        int tower = 0;
+        int grid = 0;
         int power = 0;
         String playerName = ClientMain.INSTANCE.getPlayerName();
-        // calculate towers and power
+        // calculate grids and power
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < 20; j++) {
-                var grid = grids[i][j];
-                var gridPlayerName = grid.getPlayer().getName();
+                var currentGrid = grids[i][j];
+                var gridPlayerName = currentGrid.getPlayer().getName();
                 if (gridPlayerName.equals(playerName)) {
-                    if (grid instanceof Tower) tower++;
-                    power+= grid.getPower();
+                    if (currentGrid.getPlayer().getName().equals(playerName)) grid++;
+                    power+= currentGrid.getPower();
                 }
             }
         }
-        String insertSql = "INSERT INTO " + tableName + " (turn, tower, power, map) VALUES(?,?,?,?)";
+        String insertSql = "INSERT INTO " + tableName + " (turn, grid, power, map) VALUES(?,?,?,?)";
         PreparedStatement pstmt = con.prepareStatement(insertSql);
         pstmt.setInt(1, turn);
-        pstmt.setInt(2, tower);
+        pstmt.setInt(2, grid);
         pstmt.setInt(3, power);
         byte[] serializedData = serialize(grids);
         pstmt.setBytes(4, serializedData);
@@ -67,12 +66,12 @@ public class DatabaseThread extends Thread {
         return deserialize(mapBlob);
     }
 
-    public int readTower(int turn) throws SQLException, IOException {
-        String sql = "SELECT tower FROM " + tableName + " WHERE turn = ?";
+    public int readGrid(int turn) throws SQLException, IOException {
+        String sql = "SELECT grid FROM " + tableName + " WHERE turn = ?";
         PreparedStatement pstmt = con.prepareStatement(sql);
         pstmt.setInt(1, turn);
         ResultSet rs = pstmt.executeQuery();
-        return rs.getInt("tower");
+        return rs.getInt("grid");
     }
 
     public int readPower(int turn) throws SQLException, IOException {
@@ -95,7 +94,7 @@ public class DatabaseThread extends Thread {
         try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
             ObjectInputStream ois = new ObjectInputStream(bais)) {
             return (Grid[][]) ois.readObject();
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | NullPointerException e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
         }
         return null;
