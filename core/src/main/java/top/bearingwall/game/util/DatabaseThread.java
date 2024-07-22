@@ -82,6 +82,12 @@ public class DatabaseThread extends Thread {
         return rs.getInt("power");
     }
 
+    public ResultSet readAll() throws SQLException, IOException {
+        String sql = "SELECT * FROM " + tableName;
+        Statement stmt = con.createStatement();
+        return stmt.executeQuery(sql);
+    }
+
     private static byte[] serialize(Object obj) throws IOException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              ObjectOutputStream oos = new ObjectOutputStream(baos)) {

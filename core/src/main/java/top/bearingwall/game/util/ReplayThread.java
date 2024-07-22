@@ -31,6 +31,16 @@ public class ReplayThread extends Thread {
                 int currentGrid = ClientDataHandler.databaseThread.readGrid(currentReplayTurn);
                 if (currentGrid == 0) {
                     // 读完了
+                    // excel
+                    var allData = ClientDataHandler.databaseThread.readAll();
+                    var excelRowList = new ArrayList<ExcelRow>();
+                    while (allData.next()) {
+                        int turn = allData.getInt("turn");
+                        int grid = allData.getInt("grid");
+                        int power = allData.getInt("power");
+                        excelRowList.add(new ExcelRow(turn, grid, power));
+                    }
+                    ReportGenerator.INSTANCE.writeExcel(excelRowList);
                     // gird
                     DefaultCategoryDataset gridData = new DefaultCategoryDataset();
                     for (int i = 1; i < currentReplayTurn; i++) {
@@ -71,7 +81,7 @@ public class ReplayThread extends Thread {
                     } catch (IOException e) {
                         ClientMain.INSTANCE.getLogger().error(e.getMessage());
                     }
-                    ReportPDF.INSTANCE.writePDF();
+                    ReportGenerator.INSTANCE.writePDF();
                     this.interrupt();
                 }
                 grid.put(currentReplayTurn,currentGrid);

@@ -7,10 +7,14 @@ import com.itextpdf.text.Image
 import com.itextpdf.text.Paragraph
 import com.itextpdf.text.pdf.BaseFont
 import com.itextpdf.text.pdf.PdfWriter
+import jxl.Workbook
+import jxl.write.Label
+import top.bearingwall.game.ClientMain.logger
+import java.io.File
 import java.io.FileOutputStream
 
 
-object ReportPDF {
+object ReportGenerator {
     fun writePDF() {
         val document = Document()
         val baseFontChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED)
@@ -46,5 +50,30 @@ object ReportPDF {
         grid.alignment = Element.ALIGN_CENTER
         document.add(grid)
         document.close()
+    }
+
+    fun writeExcel(list: List<ExcelRow>) {
+        val file = File("report.xls");
+        val wwb = Workbook.createWorkbook(file)
+        val ws = wwb.createSheet("报告",0)
+
+        val labelTurn = Label(0,0,"回合(turn)")
+        val labelGrid = Label(1,0,"占领格数(grid)")
+        val labelPower = Label(2,0,"总兵力(power)")
+        ws.addCell(labelTurn)
+        ws.addCell(labelGrid)
+        ws.addCell(labelPower)
+
+        for (i in 0..list.size - 1) {
+            val turn = Label(0,i+1,list.get(i).turn.toString())
+            val grid = Label(1,i+1,list.get(i).grid.toString())
+            val power = Label(2,i+1,list.get(i).power.toString())
+            ws.addCell(turn)
+            ws.addCell(grid)
+            ws.addCell(power)
+        }
+        wwb.write()
+        logger.info("excel导出成功")
+        wwb.close()
     }
 }
