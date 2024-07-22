@@ -19,7 +19,6 @@ dependencies {
   implementation 'com.itextpdf:itext-asian:5.2.0'
   // https://mvnrepository.com/artifact/net.sourceforge.jexcelapi/jxl
   implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
-
 }
 repositories {
     mavenCentral()

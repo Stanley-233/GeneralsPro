@@ -70,6 +70,17 @@ public class ClientThread extends Thread {
         }
     }
 
+    @Override
+    public void interrupt() {
+        try {
+            connection.close();
+        } catch (IOException e) {
+            ClientMain.INSTANCE.getLogger().error(e.getLocalizedMessage());
+        } finally {
+            super.interrupt();
+        }
+    }
+
     public static void sendMove(Move move) throws IOException {
         oos.reset();
         oos.writeObject(move);
