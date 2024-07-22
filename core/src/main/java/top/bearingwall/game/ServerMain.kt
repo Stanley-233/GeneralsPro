@@ -6,6 +6,7 @@ import top.bearingwall.game.net.Move
 import top.bearingwall.game.net.ServerThread
 import java.lang.Thread.sleep
 import java.net.ServerSocket
+import java.net.SocketException
 import java.util.*
 
 object ServerMain {
@@ -73,13 +74,25 @@ object ServerMain {
             println("main: 游戏已开始")
             while (!gameEnd) {
                 nextTurn()
-                for (x in 0..<clients.size) {
-                    val client = clients[x]
-                    client!!.sendMap()
-                }
-                for (x in 0..<clients.size) {
-                    val client = clients[x]
-                    client!!.sendTurn(turnCount)
+                try {
+                    for (x in 0..<clients.size) {
+                        val client = clients[x]
+                        try {
+                            client!!.sendMap()
+                        } catch (e: SocketException) {
+                            clients.remove(x)
+                        }
+                    }
+                    for (x in 0..<clients.size) {
+                        val client = clients[x]
+                        try {
+                            client!!.sendTurn(turnCount)
+                        } catch (e: SocketException) {
+                            clients.remove(x)
+                        }
+                    }
+                } catch (e : RuntimeException) {
+                    System.err.println(e.localizedMessage)
                 }
             }
         }
@@ -143,12 +156,14 @@ object ServerMain {
                                         val loser = grids[endX][endY].player
                                         clients.get(winner.id)?.sendString("win")
                                         clients.get(loser.id)?.sendString("lose")
+                                        clients.remove(loser.id)
                                         grids[m.originX][m.originY].power = 1
                                         grids[endX][endY] = Tower(grids[m.originX][m.originY].player,endNowPower,endX,endY)
                                         gameEnd = true
                                     } else {
                                         val loser = grids[endX][endY].player
                                         clients.get(loser.id)?.sendString("lose")
+                                        clients.remove(loser.id)
                                         grids[m.originX][m.originY].power = 1
                                         grids[endX][endY] = Tower(grids[m.originX][m.originY].player,endNowPower,endX,endY)
                                         leftPlayerCount--
