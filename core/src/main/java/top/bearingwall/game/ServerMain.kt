@@ -77,19 +77,11 @@ object ServerMain {
                 try {
                     for (x in 0..<clients.size) {
                         val client = clients[x]
-                        try {
-                            client!!.sendMap()
-                        } catch (e: SocketException) {
-                            clients.remove(x)
-                        }
+                        client!!.sendMap()
                     }
                     for (x in 0..<clients.size) {
                         val client = clients[x]
-                        try {
-                            client!!.sendTurn(turnCount)
-                        } catch (e: SocketException) {
-                            clients.remove(x)
-                        }
+                        client!!.sendTurn(turnCount)
                     }
                 } catch (e : RuntimeException) {
                     System.err.println(e.localizedMessage)
