@@ -6,7 +6,6 @@ import top.bearingwall.game.net.Move
 import top.bearingwall.game.net.ServerThread
 import java.lang.Thread.sleep
 import java.net.ServerSocket
-import java.net.SocketException
 import java.util.*
 
 object ServerMain {
@@ -24,7 +23,7 @@ object ServerMain {
     @JvmStatic
     fun main(args: Array<String>) {
         println("服务器启动...")
-        println("Devleoped by 23301171 @ BJTU")
+        println("Developed by 23301171 @ BJTU")
         val grids = Array(20) {
             arrayOfNulls<Grid>(20)
         }
@@ -75,13 +74,17 @@ object ServerMain {
             while (!gameEnd) {
                 nextTurn()
                 try {
-                    for (x in 0..<clients.size) {
-                        val client = clients[x]
-                        client!!.sendMap()
-                    }
-                    for (x in 0..<clients.size) {
-                        val client = clients[x]
-                        client!!.sendTurn(turnCount)
+//                    for (x in 0..<clients.size) {
+//                        val client = clients[x]
+//                        client!!.sendMap()
+//                    }
+//                    for (x in 0..<clients.size) {
+//                        val client = clients[x]
+//                        client!!.sendTurn(turnCount)
+//                    }
+                    for (x in clients.values) {
+                        x.sendMap()
+                        x.sendTurn(turnCount)
                     }
                 } catch (e : RuntimeException) {
                     System.err.println(e.localizedMessage)
