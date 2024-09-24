@@ -5,7 +5,7 @@ BJTU 软件工程专业第一学年小学期实训项目，仿 [generals.io](htt
 This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
 
 ## 运行截图
-[截图1](./docs/img1.png)
+![截图1](./docs/img1.png)
 
 ## Platforms
 
