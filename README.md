@@ -1,8 +1,11 @@
 # Generals Pro
 
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
+BJTU 软件工程专业第一学年小学期实训项目，仿 [generals.io](https://generals.io) 的 Java/Kotlin 多人策略对战小游戏，基于 [libGDX](https://libgdx.com/) ；实现了 Sqlite 存储数据、文档生成、统计图生成等简单的拓展功能。
 
 This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
+
+## 运行截图
+[截图1](./docs/img1.png)
 
 ## Platforms
 
